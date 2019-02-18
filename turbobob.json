@@ -1,0 +1,20 @@
+{
+	"for_description_of_this_file_see": "https://github.com/function61/turbobob",
+	"version_major": 1,
+	"project_name": "eventkit",
+	"builders": [
+		{
+			"name": "default",
+			"uses": "docker://fn61/buildkit-golang:20190215_1406_9218bf67",
+			"mount_destination": "/go/src/github.com/function61/eventkit",
+			"workdir": "/go/src/github.com/function61/eventkit",
+			"commands": {
+				"build": ["bin/build.sh"],
+				"dev": ["bash"]
+			}
+		}
+	],
+	"os_arches": {
+		"linux-amd64": true
+	}
+}
