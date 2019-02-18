@@ -135,6 +135,8 @@ func (d *DatatypeDef) AsTypeScriptType() string {
 			tsType = "string"
 		case "boolean":
 			tsType = "boolean"
+		case "date":
+			tsType = "dateRFC3339"
 		case "datetime":
 			tsType = "datetimeRFC3339"
 		case "binary":
