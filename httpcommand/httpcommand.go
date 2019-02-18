@@ -1,5 +1,8 @@
 package httpcommand
 
+// Generic command dispatcher boilerplate. Takes in POST /api/command/... request and
+// dispatches it to the command handler, and submits possible events to an event log.
+
 import (
 	"encoding/json"
 	"github.com/function61/eventkit/command"
