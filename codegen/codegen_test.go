@@ -2,6 +2,7 @@ package codegen
 
 import (
 	"github.com/function61/gokit/assert"
+	"sort"
 	"testing"
 )
 
@@ -26,8 +27,9 @@ func TestFlattenDatatype(t *testing.T) {
 	}
 
 	flattened := flattenDatatype(person)
+	sort.Slice(flattened, func(i, j int) bool { return flattened[i].NameRaw < flattened[j].NameRaw })
 	assert.Assert(t, len(flattened) == 3)
-	assert.EqualString(t, flattened[0].NameRaw, "object")
-	assert.EqualString(t, flattened[1].NameRaw, "string")
-	assert.EqualString(t, flattened[2].NameRaw, "boolean")
+	assert.EqualString(t, flattened[0].NameRaw, "boolean")
+	assert.EqualString(t, flattened[1].NameRaw, "object")
+	assert.EqualString(t, flattened[2].NameRaw, "string")
 }
