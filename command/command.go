@@ -11,9 +11,19 @@ type Ctx struct {
 	RemoteAddr string
 	UserAgent  string
 
-	SetCookie *http.Cookie
-
 	raisedEvents []event.Event
+
+	cookies []*http.Cookie
+}
+
+func NewCtx(meta event.EventMeta, remoteAddr string, userAgent string) *Ctx {
+	return &Ctx{
+		Meta:         meta,
+		RemoteAddr:   remoteAddr,
+		UserAgent:    userAgent,
+		raisedEvents: []event.Event{},
+		cookies:      []*http.Cookie{},
+	}
 }
 
 func (c *Ctx) GetRaisedEvents() []event.Event {
@@ -22,6 +32,14 @@ func (c *Ctx) GetRaisedEvents() []event.Event {
 
 func (c *Ctx) RaisesEvent(event event.Event) {
 	c.raisedEvents = append(c.raisedEvents, event)
+}
+
+func (c *Ctx) AddCookie(cookie *http.Cookie) {
+	c.cookies = append(c.cookies, cookie)
+}
+
+func (c *Ctx) Cookies() []*http.Cookie {
+	return c.cookies
 }
 
 type Command interface {

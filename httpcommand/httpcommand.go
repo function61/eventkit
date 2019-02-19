@@ -80,11 +80,10 @@ func Serve(
 		return badRequest("command_validation_failed", errValidate.Error())
 	}
 
-	ctx := &command.Ctx{
-		RemoteAddr: r.RemoteAddr,
-		UserAgent:  r.Header.Get("User-Agent"),
-		Meta:       event.Meta(time.Now(), userId),
-	}
+	ctx := command.NewCtx(
+		event.Meta(time.Now(), userId),
+		r.RemoteAddr,
+		r.Header.Get("User-Agent"))
 
 	if errInvoke := cmdStruct.Invoke(ctx, handlers); errInvoke != nil {
 		return badRequest("command_failed", errInvoke.Error())
@@ -96,8 +95,8 @@ func Serve(
 		return customError("event_append_failed", err.Error(), http.StatusInternalServerError)
 	}
 
-	if ctx.SetCookie != nil {
-		http.SetCookie(w, ctx.SetCookie)
+	for _, cookie := range ctx.Cookies() {
+		http.SetCookie(w, cookie)
 	}
 
 	return nil
