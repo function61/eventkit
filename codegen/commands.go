@@ -133,12 +133,31 @@ func (c *CommandFieldSpec) AsGoType() string {
 	}
 }
 
+func (c *CommandFieldSpec) AsTsType() string {
+	switch c.Type {
+	case "text":
+		return "string"
+	case "multiline":
+		return "string"
+	case "password":
+		return "string"
+	case "checkbox":
+		return "boolean"
+	case "integer":
+		return "number"
+	case "date":
+		return "datetimeRFC3339"
+	default:
+		return ""
+	}
+}
+
 func (c *CommandFieldSpec) Validate() error {
 	if c.Type == "" {
 		c.Type = "text"
 	}
 
-	if c.AsGoType() == "" {
+	if c.AsGoType() == "" || c.AsTsType() == "" {
 		return errors.New("field " + c.Key + " has invalid type: " + c.Type)
 	}
 
@@ -181,13 +200,11 @@ func (c *CommandSpec) MakeValidation() string {
 func (c *CommandSpec) FieldsForTypeScript() string {
 	fields := []string{}
 
-	emptyString := `''`
-
 	for _, fieldSpec := range c.Fields {
 		fieldSerialized := ""
 
-		fieldToTypescript := func(fieldSpec *CommandFieldSpec, tsKind string) string {
-			defVal := emptyString
+		fieldToTypescript := func(fieldSpec *CommandFieldSpec, tsKind string, defValKey string) string {
+			defVal := "undefined" // .. in literal TypeScript code
 			for _, ctorArg := range c.CtorArgs {
 				if ctorArg == fieldSpec.Key {
 					defVal = fieldSpec.Key
@@ -196,11 +213,12 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 			}
 
 			return fmt.Sprintf(
-				`{ Key: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, DefaultValueString: %s, Help: '%s', ValidationRegex: '%s' },`,
+				`{ Key: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', ValidationRegex: '%s' },`,
 				fieldSpec.Key,
 				!fieldSpec.Optional,
 				fieldSpec.HideIfDefaultValue,
 				tsKind,
+				defValKey,
 				defVal,
 				fieldSpec.Help,
 				fieldSpec.ValidationRegex)
@@ -208,17 +226,17 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 
 		switch fieldSpec.Type {
 		case "text":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Text")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Text", "DefaultValueString")
 		case "multiline":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Multiline")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Multiline", "DefaultValueString")
 		case "password":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Password")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Password", "DefaultValueString")
 		case "checkbox":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Checkbox")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Checkbox", "DefaultValueBoolean")
 		case "integer":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Integer")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Integer", "DefaultValueNumber")
 		case "date":
-			fieldSerialized = fieldToTypescript(fieldSpec, "Date")
+			fieldSerialized = fieldToTypescript(fieldSpec, "Date", "DefaultValueString")
 		default:
 			panic(fmt.Errorf("Unsupported field type for UI: %s", fieldSpec.Type))
 		}
@@ -233,8 +251,23 @@ func (c *CommandSpec) CtorArgsForTypeScript() string {
 	ctorArgs := []string{}
 
 	for _, ctorArg := range c.CtorArgs {
-		ctorArgs = append(ctorArgs, ctorArg+": string")
+		spec := c.fieldSpecByKey(ctorArg)
+		if spec == nil {
+			panic("field for CtorArg not found")
+		}
+
+		ctorArgs = append(ctorArgs, ctorArg+": " + spec.AsTsType())
 	}
 
 	return strings.Join(ctorArgs, ", ")
+}
+
+func (c *CommandSpec) fieldSpecByKey(key string) *CommandFieldSpec {
+	for _, field := range c.Fields {
+		if field.Key == key {
+			return field
+		}
+	}
+
+	return nil
 }
