@@ -256,7 +256,7 @@ func (c *CommandSpec) CtorArgsForTypeScript() string {
 			panic("field for CtorArg not found")
 		}
 
-		ctorArgs = append(ctorArgs, ctorArg+": " + spec.AsTsType())
+		ctorArgs = append(ctorArgs, ctorArg+": "+spec.AsTsType())
 	}
 
 	return strings.Join(ctorArgs, ", ")
