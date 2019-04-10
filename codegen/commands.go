@@ -52,6 +52,7 @@ type CommandFieldSpec struct {
 	Key                string `json:"key"`
 	Type               string `json:"type"`
 	ValidationRegex    string `json:"validation_regex"`
+	MaxLength          *int   `json:"max_length"`
 	Optional           bool   `json:"optional"`
 	HideIfDefaultValue bool   `json:"hideIfDefaultValue"`
 	Help               string `json:"help"`
@@ -67,7 +68,9 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 	if goType == "string" || goType == "password" {
 		maxLen := 128
 
-		if c.Type == "multiline" {
+		if c.MaxLength != nil {
+			maxLen = *c.MaxLength
+		} else if c.Type == "multiline" {
 			maxLen = 4 * 1024
 		}
 
