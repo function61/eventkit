@@ -155,9 +155,10 @@ const {{.Key}} = "{{.Value}}";
 const BackendRestEndpoints = `package {{.ModuleId}}
 
 import (
-	"net/http"
 	"encoding/json"
 	"github.com/function61/gokit/httpauth"
+	"net/http"
+	"net/url"
 )
 
 type HttpHandlers interface { {{range .ApplicationTypes.Endpoints}}
@@ -207,4 +208,26 @@ func parseJsonInput(w http.ResponseWriter, r *http.Request, input interface{}) b
 
 	return true
 }
+
+type RestClientUrlBuilder struct {
+	baseUrl string
+}
+
+func NewRestClientUrlBuilder(baseUrl string) *RestClientUrlBuilder {
+	return &RestClientUrlBuilder{baseUrl}
+}
+
+{{range .ApplicationTypes.Endpoints}}
+// {{.Path}}
+func (r *RestClientUrlBuilder) {{UppercaseFirst .Name}}({{.GoArgs}}) string {
+	return r.baseUrl + "{{.GoPath}}"
+}
+{{end}}
+
+// a hack so we don't have to conditionally import net/url module
+// FIXME: path components should be escaped differently than query comps
+func queryEscape(s string) string {
+	return url.QueryEscape(s)
+}
+
 `

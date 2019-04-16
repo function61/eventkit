@@ -60,22 +60,45 @@ func (e *EndpointDefinition) TypescriptPath() string {
 	return strings.NewReplacer(replacements...).Replace(e.Path)
 }
 
+// FIXME: URL escaping
+// "/users/{id}" => "/users/"+id+""
+// "/search?q={query}" => "/search?query="+query+""
+func (e *EndpointDefinition) GoPath() string {
+	replacements := []string{}
+
+	for _, item := range routePlaceholderParseRe.FindAllStringSubmatch(e.Path, -1) {
+		replacements = append(replacements,
+			item[0],
+			"\"+queryEscape("+item[1]+")+\"")
+	}
+
+	return strings.NewReplacer(replacements...).Replace(e.Path)
+}
+
 var routePlaceholderParseRe = regexp.MustCompile("\\{([a-zA-Z0-9]+)\\}")
 
 // "/users/{id}/addresses/{idx}" => "id: string, idx: string"
 func (e *EndpointDefinition) TypescriptArgs() string {
-	parsed := routePlaceholderParseRe.FindAllStringSubmatch(e.Path, -1)
-	typescriptedArgs := []string{}
-
-	for _, item := range parsed {
-		typescriptedArgs = append(typescriptedArgs, item[1]+": string")
+	args := []string{}
+	for _, item := range routePlaceholderParseRe.FindAllStringSubmatch(e.Path, -1) {
+		args = append(args, item[1]+": string")
 	}
 
 	if e.Consumes != nil {
-		typescriptedArgs = append(typescriptedArgs, "body: "+e.Consumes.AsTypeScriptType())
+		args = append(args, "body: "+e.Consumes.AsTypeScriptType())
 	}
 
-	return strings.Join(typescriptedArgs, ", ")
+	return strings.Join(args, ", ")
+}
+
+// "/users/{id}/addresses/{idx}" => "id string, idx string"
+func (e *EndpointDefinition) GoArgs() string {
+	args := []string{}
+	for _, item := range routePlaceholderParseRe.FindAllStringSubmatch(e.Path, -1) {
+		args = append(args, item[1]+" string")
+	}
+
+	return strings.Join(args, ", ")
 }
 
 type NamedDatatypeDef struct {
