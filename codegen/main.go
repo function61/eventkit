@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 type Module struct {
 	// config
-	Id string
+	Id   string // "vstotypes"
+	Path string // "vstoserver/vstotypes"
 
 	// input files
 	EventsSpecFile   string
@@ -23,14 +25,20 @@ type Module struct {
 	Commands   *CommandSpecFile
 }
 
+var moduleIdFromModulePathRe = regexp.MustCompile("[^/]+$")
+
 func NewModule(
-	id string,
+	modulePath string,
 	typesFile string,
 	eventsSpecFile string,
 	commandSpecFile string,
 ) *Module {
+	// "vstoserver/vstotypes" => "vstotypes"
+	id := moduleIdFromModulePathRe.FindStringSubmatch(modulePath)[0]
+
 	return &Module{
 		Id:               id,
+		Path:             modulePath,
 		EventsSpecFile:   eventsSpecFile,
 		CommandsSpecFile: commandSpecFile,
 		TypesFile:        typesFile,
@@ -131,15 +139,15 @@ func processModule(mod *Module, opts Opts) error {
 	}
 
 	backendPath := func(file string) string {
-		return "pkg/" + mod.Id + "/" + file
+		return "pkg/" + mod.Path + "/" + file
 	}
 
 	frontendPath := func(file string) string {
-		return "frontend/generated/" + mod.Id + "_" + file
+		return "frontend/generated/" + mod.Path + "_" + file
 	}
 
 	docPath := func(file string) string {
-		return "docs/" + mod.Id + "/" + file
+		return "docs/" + mod.Path + "/" + file
 	}
 
 	data := &TplData{
