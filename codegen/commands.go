@@ -208,6 +208,10 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 
 		fieldToTypescript := func(fieldSpec *CommandFieldSpec, tsKind string, defValKey string) string {
 			defVal := "undefined" // .. in literal TypeScript code
+			if tsKind == "Checkbox" {
+				defVal = "false"
+			}
+
 			for _, ctorArg := range c.CtorArgs {
 				if ctorArg == fieldSpec.Key {
 					defVal = fieldSpec.Key
