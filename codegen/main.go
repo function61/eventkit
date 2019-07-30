@@ -152,6 +152,7 @@ func processModule(mod *Module, opts Opts) error {
 
 	data := &TplData{
 		ModuleId:               mod.Id,
+		ModulePath:             mod.Path,
 		Opts:                   opts,
 		AnyEndpointHasConsumes: anyEndpointHasConsumes,
 		TypesImports:           typesImports,

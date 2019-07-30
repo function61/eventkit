@@ -33,7 +33,7 @@ const FrontendRestEndpoints = `// tslint:disable
 
 import { {{range .ApplicationTypes.EndpointsProducesAndConsumesTypescriptTypes}}
 	{{.}},{{end}}
-} from '{{$.Opts.FrontendModulePrefix}}{{.ModuleId}}_types';
+} from '{{$.Opts.FrontendModulePrefix}}{{.ModulePath}}_types';
 import {
 	getJson,
 {{if .AnyEndpointHasConsumes}}	postJson,{{end}}
