@@ -1,7 +1,6 @@
-package httpcommand
-
 // Generic command dispatcher boilerplate. Takes in POST /api/command/... request and
 // dispatches it to the command handler, and submits possible events to an event log.
+package httpcommand
 
 import (
 	"encoding/json"
@@ -11,6 +10,10 @@ import (
 	"github.com/function61/gokit/httpauth"
 	"net/http"
 	"time"
+)
+
+const (
+	CreatedRecordIdHeaderKey = "x-created-record-id"
 )
 
 type HttpError struct {
@@ -97,6 +100,10 @@ func Serve(
 
 	for _, cookie := range ctx.Cookies() {
 		http.SetCookie(w, cookie)
+	}
+
+	if id := ctx.GetCreatedRecordId(); id != "" {
+		w.Header().Set(CreatedRecordIdHeaderKey, id)
 	}
 
 	return nil

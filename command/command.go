@@ -14,6 +14,9 @@ type Ctx struct {
 	raisedEvents []event.Event
 
 	cookies []*http.Cookie
+
+	// if you need to return to the client an ID of the record that was created
+	createdRecordId string
 }
 
 func NewCtx(meta event.EventMeta, remoteAddr string, userAgent string) *Ctx {
@@ -36,6 +39,14 @@ func (c *Ctx) RaisesEvent(event event.Event) {
 
 func (c *Ctx) AddCookie(cookie *http.Cookie) {
 	c.cookies = append(c.cookies, cookie)
+}
+
+func (c *Ctx) CreatedRecordId(id string) {
+	c.createdRecordId = id
+}
+
+func (c *Ctx) GetCreatedRecordId() string {
+	return c.createdRecordId
 }
 
 func (c *Ctx) Cookies() []*http.Cookie {
