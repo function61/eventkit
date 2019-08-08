@@ -1,3 +1,4 @@
+// Command running interface => command gets some context, raises some events when it runs
 package command
 
 import (

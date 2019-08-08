@@ -1,3 +1,4 @@
+// Event structure. Event has a name, occurrs at some point in time and is raised by some user. Serializes to JSON
 package event
 
 import (

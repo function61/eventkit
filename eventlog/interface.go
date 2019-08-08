@@ -1,3 +1,4 @@
+// Provides an interface for persisting Events
 package eventlog
 
 import (
