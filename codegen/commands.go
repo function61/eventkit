@@ -99,12 +99,12 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 		regexSnippet := ""
 		if c.ValidationRegex != "" {
 			regexSnippet = fmt.Sprintf(
-				`if err := regexpValidation("%s", "%s", x.%s); err != nil {
+				`if err := regexpValidation("%s", '%s', x.%s); err != nil {
 		return err
 	}
 	`,
 				c.Key,
-				strings.Replace(c.ValidationRegex, `\`, `\\`, -1),
+				escapeStringInsideJsSingleQuotes(c.ValidationRegex),
 				c.Key)
 		}
 
@@ -227,7 +227,7 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 				tsKind,
 				defValKey,
 				defVal,
-				fieldSpec.Help,
+				escapeStringInsideJsSingleQuotes(fieldSpec.Help),
 				fieldSpec.ValidationRegex)
 		}
 
@@ -277,4 +277,8 @@ func (c *CommandSpec) fieldSpecByKey(key string) *CommandFieldSpec {
 	}
 
 	return nil
+}
+
+func escapeStringInsideJsSingleQuotes(in string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(in, `\`, `\\`), `'`, `\'`)
 }
