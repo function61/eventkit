@@ -11,11 +11,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fd10d83f406bde958dce8f183b77c86953f969d62d04cd0774a00b0d44ba814f"
+  digest = "1:31edd1b2caed9c9a9ab71843cde222dfeb50812cfdb0bdf6ff470dbee9c37faf"
   name = "github.com/function61/gokit"
   packages = [
     "assert",
     "cryptorandombytes",
+    "ezhttp",
     "httpauth",
     "jsonfile",
     "logex",
@@ -29,6 +30,7 @@
   input-imports = [
     "github.com/function61/gokit/assert",
     "github.com/function61/gokit/cryptorandombytes",
+    "github.com/function61/gokit/ezhttp",
     "github.com/function61/gokit/httpauth",
     "github.com/function61/gokit/jsonfile",
     "github.com/function61/gokit/logex",
