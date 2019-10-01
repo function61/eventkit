@@ -59,7 +59,7 @@ import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from '
 {{end}}
 
 {{range .CommandSpecs}}
-export function {{.AsGoStructName}}({{.CtorArgsForTypeScript}}): CommandDefinition {
+export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}settings: CommandSettings = {}): CommandDefinition {
 	return {
 		key: '{{.Command}}',{{if .AdditionalConfirmation}}
 		additional_confirmation: '{{.AdditionalConfirmation}}',
@@ -68,6 +68,7 @@ export function {{.AsGoStructName}}({{.CtorArgsForTypeScript}}): CommandDefiniti
 		fields: [
 {{.FieldsForTypeScript}}
 		],
+		settings: settings,
 	};
 }
 {{end}}
