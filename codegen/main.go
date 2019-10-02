@@ -3,6 +3,7 @@ package codegen
 import (
 	"github.com/function61/eventkit/codegen/codegentemplates"
 	"github.com/function61/gokit/jsonfile"
+	"github.com/function61/gokit/sliceutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -95,6 +96,7 @@ func processModule(mod *Module, opts Opts) error {
 	typesImports.ModuleIds = uniqueModuleIdsFromDatatypes(uniqueTypes)
 
 	commandsImports := NewImports()
+	commandsImportsUi := NewImports()
 
 	eventsImports := NewImports()
 
@@ -134,6 +136,10 @@ func processModule(mod *Module, opts Opts) error {
 		for _, field := range command.Fields {
 			if field.Type == "date" {
 				commandsImports.Date = true
+
+				if sliceutil.ContainsString(command.CtorArgs, field.Key) {
+					commandsImportsUi.Date = true
+				}
 			}
 		}
 	}
@@ -157,6 +163,7 @@ func processModule(mod *Module, opts Opts) error {
 		AnyEndpointHasConsumes: anyEndpointHasConsumes,
 		TypesImports:           typesImports,
 		CommandsImports:        commandsImports,
+		CommandsImportsUi:      commandsImportsUi,
 		EventsImports:          eventsImports,
 		DomainSpecs:            mod.EventsSpec, // backwards compat
 		CommandSpecs:           mod.Commands,   // backwards compat

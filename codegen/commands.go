@@ -149,6 +149,8 @@ func (c *CommandFieldSpec) AsTsType() string {
 	case "integer":
 		return "number"
 	case "date":
+		return "dateRFC3339"
+	case "datetime":
 		return "datetimeRFC3339"
 	default:
 		return ""

@@ -55,7 +55,9 @@ const FrontendCommandDefinitions = `// tslint:disable
 // WARNING: generated file
 
 import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from 'f61ui/commandtypes';
-{{if .TypesImports.DateTime}}import {datetimeRFC3339} from 'f61ui/types';
+{{if .CommandsImportsUi.Date}}import {dateRFC3339} from 'f61ui/types';
+{{end}}
+{{if .CommandsImportsUi.DateTime}}import {datetimeRFC3339} from 'f61ui/types';
 {{end}}
 
 {{range .CommandSpecs}}

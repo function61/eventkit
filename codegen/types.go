@@ -57,6 +57,7 @@ type TplData struct {
 	AnyEndpointHasConsumes bool
 	TypesImports           Imports
 	CommandsImports        Imports
+	CommandsImportsUi      Imports // UI only needs types that are mentioned in ctor
 	EventsImports          Imports
 	DomainSpecs            *DomainFile
 	CommandSpecs           *CommandSpecFile
