@@ -56,6 +56,7 @@ type CommandFieldSpec struct {
 	Optional           bool   `json:"optional"`
 	HideIfDefaultValue bool   `json:"hideIfDefaultValue"`
 	Help               string `json:"help"`
+	Placeholder        string `json:"placeholder"`
 }
 
 func (c *CommandFieldSpec) AsGoField() string {
@@ -222,7 +223,7 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 			}
 
 			return fmt.Sprintf(
-				`{ Key: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', ValidationRegex: '%s' },`,
+				`{ Key: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', ValidationRegex: '%s' },`,
 				fieldSpec.Key,
 				!fieldSpec.Optional,
 				fieldSpec.HideIfDefaultValue,
@@ -230,6 +231,7 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 				defValKey,
 				defVal,
 				escapeStringInsideJsSingleQuotes(fieldSpec.Help),
+				escapeStringInsideJsSingleQuotes(fieldSpec.Placeholder),
 				fieldSpec.ValidationRegex)
 		}
 
