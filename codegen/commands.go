@@ -50,6 +50,7 @@ func (c *CommandSpec) Validate() error {
 
 type CommandFieldSpec struct {
 	Key                string `json:"key"`
+	Title              string `json:"title"`
 	Type               string `json:"type"`
 	ValidationRegex    string `json:"validation_regex"`
 	MaxLength          *int   `json:"max_length"`
@@ -223,8 +224,9 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 			}
 
 			return fmt.Sprintf(
-				`{ Key: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', ValidationRegex: '%s' },`,
+				`{ Key: '%s', Title: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', ValidationRegex: '%s' },`,
 				fieldSpec.Key,
+				escapeStringInsideJsSingleQuotes(fieldSpec.Title),
 				!fieldSpec.Optional,
 				fieldSpec.HideIfDefaultValue,
 				tsKind,
