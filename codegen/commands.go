@@ -284,5 +284,14 @@ func (c *CommandSpec) fieldSpecByKey(key string) *CommandFieldSpec {
 }
 
 func escapeStringInsideJsSingleQuotes(in string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(in, `\`, `\\`), `'`, `\'`)
+	return strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				in,
+				`\`,
+				`\\`),
+			"\n",
+			`\n`),
+		`'`,
+		`\'`)
 }
