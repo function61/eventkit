@@ -138,6 +138,10 @@ const (
 	{{$member.GoKey}} {{$enum.Name}} = "{{$member.GoValue}}"{{end}}
 )
 
+var {{$enum.Name}}Members = []{{$enum.Name}}{ {{range $_, $member := $enum.Members}}
+	{{$member.GoKey}},{{end}}
+}
+
 // digest in name because there's no easy way to make exhaustive Enum pattern matching
 // in Go, so we hack around it by calling this generated function everywhere we want
 // to do the pattern match, and when enum members change the digest changes and thus
