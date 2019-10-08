@@ -119,7 +119,9 @@ func DispatchEvent(event event.Event, listener EventListener) error {
 
 const BackendTypes = `package {{.ModuleId}}
 
-import (
+import ( {{if .StringEnums}}
+	"fmt"
+	"encoding/json"{{end}}
 {{if .TypesImports.Date}}	"github.com/function61/eventkit/guts"
 {{end}}{{if .TypesImports.DateTime}}	"time"
 {{end}}{{range .TypesImports.ModuleIds}}
@@ -140,6 +142,34 @@ const (
 
 var {{$enum.Name}}Members = []{{$enum.Name}}{ {{range $_, $member := $enum.Members}}
 	{{$member.GoKey}},{{end}}
+}
+
+func (e *{{$enum.Name}}) MarshalJSON() ([]byte, error) {
+	str := string(*e)
+	return json.Marshal(&str)
+}
+
+func (e *{{$enum.Name}}) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return err
+	}
+	validated, err := {{$enum.Name}}Validate(str)
+	if err != nil {
+		return err
+	}
+	*e = validated
+	return nil
+}
+
+func {{$enum.Name}}Validate(input string) ({{$enum.Name}}, error) {
+	for _, member := range {{$enum.Name}}Members {
+		if member == {{$enum.Name}}(input) {
+			return member, nil
+		}
+	}
+
+	return "", fmt.Errorf("invalid {{$enum.Name}} member: %s", input)
 }
 
 // digest in name because there's no easy way to make exhaustive Enum pattern matching

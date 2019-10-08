@@ -54,6 +54,9 @@ export function {{.Name}}Url({{.TypescriptArgs}}): string {
 const FrontendCommandDefinitions = `// tslint:disable
 // WARNING: generated file
 
+{{if .CommandSpecs.ImportedCustomFieldTypes}}import { {{range .CommandSpecs.ImportedCustomFieldTypes}}
+	{{.}},{{end}}
+} from '{{$.Opts.FrontendModulePrefix}}{{.ModulePath}}_types';{{end}}
 import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from 'f61ui/commandtypes';
 {{if .CommandsImportsUi.Date}}import {dateRFC3339} from 'f61ui/types';
 {{end}}

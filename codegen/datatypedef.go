@@ -82,7 +82,11 @@ func isUppercase(input string) bool {
 }
 
 func (d *DatatypeDef) isCustomType() bool {
-	return isUppercase(d.Name()[0:1])
+	return isCustomType(d.Name()[0:1])
+}
+
+func isCustomType(name string) bool {
+	return isUppercase(name)
 }
 
 func uniqueModuleIdsFromDatatypes(dts []*DatatypeDef) []string {

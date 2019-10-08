@@ -18,6 +18,20 @@ func (c *CommandSpecFile) Validate() error {
 	return nil
 }
 
+func (c *CommandSpecFile) ImportedCustomFieldTypes() []string {
+	customTypes := []string{}
+
+	for _, cmd := range *c {
+		for _, field := range cmd.Fields {
+			if isCustomType(field.Type) {
+				customTypes = append(customTypes, field.Type)
+			}
+		}
+	}
+
+	return customTypes
+}
+
 type CommandSpec struct {
 	Command                string              `json:"command"`
 	Title                  string              `json:"title"`
@@ -114,6 +128,20 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 	} else if goType == "bool" || goType == "int" || goType == "guts.Date" {
 		// presence check not possible for these types
 		return ""
+	} else if isCustomType(goType) { // assuming string-enum
+		emptySnippet := ""
+
+		if !c.Optional {
+			emptySnippet = fmt.Sprintf(
+				`if x.%s == "" {
+		return fieldEmptyValidationError("%s")
+	}
+	`,
+				c.Key,
+				c.Key)
+		}
+
+		return emptySnippet
 	} else {
 		panic(errors.New("validation not supported for type: " + goType))
 	}
@@ -134,6 +162,10 @@ func (c *CommandFieldSpec) AsGoType() string {
 	case "date":
 		return "guts.Date"
 	default:
+		if isCustomType(c.Type) {
+			return c.Type
+		}
+
 		return ""
 	}
 }
@@ -155,6 +187,10 @@ func (c *CommandFieldSpec) AsTsType() string {
 	case "datetime":
 		return "datetimeRFC3339"
 	default:
+		if isCustomType(c.Type) {
+			return c.Type
+		}
+
 		return ""
 	}
 }
@@ -251,7 +287,11 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 		case "date":
 			fieldSerialized = fieldToTypescript(fieldSpec, "Date", "DefaultValueString")
 		default:
-			panic(fmt.Errorf("Unsupported field type for UI: %s", fieldSpec.Type))
+			if isCustomType(fieldSpec.Type) { // assuming string-enum (modeling it as Text ui-input for now..)
+				fieldSerialized = fieldToTypescript(fieldSpec, "Text", "DefaultValueString")
+			} else {
+				panic(fmt.Errorf("Unsupported field type for UI: %s", fieldSpec.Type))
+			}
 		}
 
 		fields = append(fields, fieldSerialized)
