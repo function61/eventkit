@@ -124,7 +124,18 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 				c.Key)
 		}
 
-		return emptySnippet + lengthSnippet + regexSnippet
+		noNewlinesSnippet := ""
+		if c.Type != "multiline" {
+			noNewlinesSnippet = fmt.Sprintf(
+				`if err := noNewlinesValidation("%s", x.%s); err != nil {
+		return err
+	}`,
+				c.Key,
+				c.Key,
+			)
+		}
+
+		return emptySnippet + lengthSnippet + regexSnippet + noNewlinesSnippet
 	} else if goType == "bool" || goType == "int" || goType == "guts.Date" {
 		// presence check not possible for these types
 		return ""

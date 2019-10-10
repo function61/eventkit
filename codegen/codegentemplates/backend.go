@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"github.com/function61/eventkit/command"
 {{if .CommandsImports.Date}}	"github.com/function61/eventkit/guts"{{end}}
 )
@@ -15,6 +16,7 @@ import (
 type CommandHandlers interface { {{range .CommandSpecs}}
 	{{.AsGoStructName}}(*{{.AsGoStructName}}, *command.Ctx) error{{end}}
 }
+
 
 // structs
 
@@ -43,9 +45,17 @@ var Allocators = command.AllocatorMap{
 
 // util functions
 
-func regexpValidation(fieldName string, pattern string, value string) error {
-	if !regexp.MustCompile(pattern).MatchString(value) {
+func regexpValidation(fieldName string, pattern string, content string) error {
+	if !regexp.MustCompile(pattern).MatchString(content) {
 		return fmt.Errorf("field %s does not match pattern %s", fieldName, pattern)
+	}
+
+	return nil
+}
+
+func noNewlinesValidation(fieldName string, content string) error {
+	if strings.ContainsAny(content, "\r\n") {
+		return errors.New("single-line field " + fieldName + " contains newlines")
 	}
 
 	return nil
