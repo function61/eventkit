@@ -3,6 +3,7 @@ package codegen
 import (
 	"errors"
 	"fmt"
+	"github.com/function61/gokit/sliceutil"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (c *CommandSpecFile) ImportedCustomFieldTypes() []string {
 
 	for _, cmd := range *c {
 		for _, field := range cmd.Fields {
-			if isCustomType(field.Type) {
+			if isCustomType(field.Type) && !sliceutil.ContainsString(customTypes, field.Type) {
 				customTypes = append(customTypes, field.Type)
 			}
 		}
