@@ -3,6 +3,7 @@
 package httpcommand
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/event"
@@ -87,14 +88,40 @@ func Serve(
 		return badRequest("json_parsing_failed", errJson.Error())
 	}
 
-	if errValidate := cmdStruct.Validate(); errValidate != nil {
-		return badRequest("command_validation_failed", errValidate.Error())
-	}
-
 	ctx := command.NewCtx(
+		context.TODO(),
 		event.Meta(time.Now(), userId),
 		r.RemoteAddr,
 		r.Header.Get("User-Agent"))
+
+	if herr := InvokeSkippingAuthorization(cmdStruct, ctx, handlers, eventLog); herr != nil {
+		return herr
+	}
+
+	for _, cookie := range ctx.Cookies() {
+		http.SetCookie(w, cookie)
+	}
+
+	if id := ctx.GetCreatedRecordId(); id != "" {
+		w.Header().Set(CreatedRecordIdHeaderKey, id)
+	}
+
+	return nil
+}
+
+// validates command, invokes it and pushes raised events to event log
+//
+// "SkippingAuthorization" suffix to warn that no authorization checks are performed
+// (i.e. this should only be used for events not triggered by user)
+func InvokeSkippingAuthorization(
+	cmdStruct command.Command,
+	ctx *command.Ctx,
+	handlers interface{},
+	eventLog eventlog.Log,
+) *HttpError {
+	if errValidate := cmdStruct.Validate(); errValidate != nil {
+		return badRequest("command_validation_failed", errValidate.Error())
+	}
 
 	if errInvoke := cmdStruct.Invoke(ctx, handlers); errInvoke != nil {
 		return badRequest("command_failed", errInvoke.Error())
@@ -104,14 +131,6 @@ func Serve(
 
 	if err := eventLog.Append(raisedEvents); err != nil {
 		return customError("event_append_failed", err.Error(), http.StatusInternalServerError)
-	}
-
-	for _, cookie := range ctx.Cookies() {
-		http.SetCookie(w, cookie)
-	}
-
-	if id := ctx.GetCreatedRecordId(); id != "" {
-		w.Header().Set(CreatedRecordIdHeaderKey, id)
 	}
 
 	return nil
