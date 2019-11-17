@@ -22,6 +22,14 @@ type HttpError struct {
 	Description string
 }
 
+func (r *HttpError) Error() string {
+	if r.Description != "" {
+		return r.ErrorCode + ": " + r.Description
+	} else {
+		return r.ErrorCode
+	}
+}
+
 func (r *HttpError) ErrorResponseAlreadySentByMiddleware() bool {
 	return r.StatusCode == 0
 }
