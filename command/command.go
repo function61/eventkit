@@ -2,11 +2,14 @@
 package command
 
 import (
+	"context"
 	"github.com/function61/eventkit/event"
 	"net/http"
 )
 
 type Ctx struct {
+	Ctx context.Context // Go's cancellation context
+
 	Meta event.EventMeta
 
 	RemoteAddr string
@@ -20,8 +23,14 @@ type Ctx struct {
 	createdRecordId string
 }
 
-func NewCtx(meta event.EventMeta, remoteAddr string, userAgent string) *Ctx {
+func NewCtx(
+	ctx context.Context,
+	meta event.EventMeta,
+	remoteAddr string,
+	userAgent string,
+) *Ctx {
 	return &Ctx{
+		Ctx:          ctx,
 		Meta:         meta,
 		RemoteAddr:   remoteAddr,
 		UserAgent:    userAgent,
