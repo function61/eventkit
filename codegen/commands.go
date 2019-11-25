@@ -24,8 +24,12 @@ func (c *CommandSpecFile) ImportedCustomFieldTypes() []string {
 
 	for _, cmd := range *c {
 		for _, field := range cmd.Fields {
-			if isCustomType(field.Type) && !sliceutil.ContainsString(customTypes, field.Type) {
-				customTypes = append(customTypes, field.Type)
+			// only types mentioned in ctor need importing
+			if isCustomType(field.Type) && sliceutil.ContainsString(cmd.CtorArgs, field.Key) {
+				// only append once
+				if !sliceutil.ContainsString(customTypes, field.Type) {
+					customTypes = append(customTypes, field.Type)
+				}
 			}
 		}
 	}
