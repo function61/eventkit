@@ -65,8 +65,8 @@ func fieldEmptyValidationError(fieldName string) error {
 	return errors.New("field " + fieldName + " cannot be empty")
 }
 
-func fieldLengthValidationError(fieldName string, maxLength int) error {
-	return fmt.Errorf("field %s exceeded maximum length %d", fieldName, maxLength)
+func fieldLengthValidationError(fieldName string, maxLength int, got int) error {
+	return fmt.Errorf("field %s exceeded maximum length %d (got %d)", fieldName, maxLength, got)
 }
 `
 

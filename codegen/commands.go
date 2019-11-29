@@ -109,7 +109,7 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 
 		lengthSnippet := fmt.Sprintf(
 			`if len(x.%s) > %d {
-		return fieldLengthValidationError("%s", %d)
+		return fieldLengthValidationError("%s", %d, len(x.%s))
 	}
 	`,
 			c.Key,
