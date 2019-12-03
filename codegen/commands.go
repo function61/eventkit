@@ -115,7 +115,8 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 			c.Key,
 			maxLen,
 			c.Key,
-			maxLen)
+			maxLen,
+			c.Key)
 
 		regexSnippet := ""
 		if c.ValidationRegex != "" {
