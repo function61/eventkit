@@ -19,7 +19,7 @@ export enum {{.Name}} {
 }
 {{end}}
 {{range .ApplicationTypes.StringConsts}}
-export const {{.Key}} = '{{.Value}}';{{end}}
+export const {{.Key}} = '{{EscapeForJsSingleQuote .Value}}';{{end}}
 {{range .ApplicationTypes.Types}}
 {{.AsTypeScriptCode}}
 {{end}}
@@ -67,8 +67,8 @@ import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from '
 export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}settings: CommandSettings = {}): CommandDefinition {
 	return {
 		key: '{{.Command}}',{{if .AdditionalConfirmation}}
-		additional_confirmation: '{{.AdditionalConfirmation}}',
-{{end}}		title: '{{.Title}}',
+		additional_confirmation: '{{EscapeForJsSingleQuote .AdditionalConfirmation}}',
+{{end}}		title: '{{EscapeForJsSingleQuote .Title}}',
 		crudNature: CrudNature.{{.CrudNature}},
 		fields: [
 {{.FieldsForTypeScript}}

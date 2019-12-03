@@ -17,8 +17,9 @@ func WriteTemplateFile(filename string, data interface{}, templateString string)
 	defer file.Close()
 
 	templateFuncs := template.FuncMap{
-		"StripQueryFromUrl": stripQueryFromUrl,
-		"UppercaseFirst":    func(input string) string { return strings.ToUpper(input[0:1]) + input[1:] },
+		"StripQueryFromUrl":      stripQueryFromUrl,
+		"UppercaseFirst":         func(input string) string { return strings.ToUpper(input[0:1]) + input[1:] },
+		"EscapeForJsSingleQuote": func(input string) string { return strings.ReplaceAll(input, `'`, `\'`) },
 	}
 
 	tpl, err := template.New("").Funcs(templateFuncs).Parse(templateString)
