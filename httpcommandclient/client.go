@@ -13,12 +13,18 @@ import (
 type Client struct {
 	baseUrl     string // looks like "http://localhost/command/"
 	bearerToken string
+	httpClient  *http.Client
 }
 
-func New(baseUrl string, bearerToken string) *Client {
+func New(baseUrl string, bearerToken string, httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
 	return &Client{
 		baseUrl:     baseUrl,
 		bearerToken: bearerToken,
+		httpClient:  httpClient,
 	}
 }
 
@@ -50,7 +56,8 @@ func (c *Client) execInternal(ctx context.Context, cmdStruct command.Command) (*
 		ctx,
 		c.baseUrl+cmdStruct.Key(),
 		ezhttp.AuthBearer(c.bearerToken),
-		ezhttp.SendJson(cmdStruct))
+		ezhttp.SendJson(cmdStruct),
+		ezhttp.Client(c.httpClient))
 	if err != nil {
 		return nil, err
 	}
