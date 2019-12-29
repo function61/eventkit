@@ -121,12 +121,12 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 		regexSnippet := ""
 		if c.ValidationRegex != "" {
 			regexSnippet = fmt.Sprintf(
-				`if err := regexpValidation("%s", '%s', x.%s); err != nil {
+				`if err := regexpValidation("%s", "%s", x.%s); err != nil {
 		return err
 	}
 	`,
 				c.Key,
-				escapeStringInsideJsSingleQuotes(c.ValidationRegex),
+				c.ValidationRegex,
 				c.Key)
 		}
 
