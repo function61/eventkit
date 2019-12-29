@@ -45,6 +45,7 @@ type CommandSpec struct {
 	MiddlewareChain        string              `json:"chain"`
 	CtorArgs               []string            `json:"ctor"`
 	Fields                 []*CommandFieldSpec `json:"fields"`
+	Info                   []string            `json:"info"`
 }
 
 func (c *CommandSpec) AsGoStructName() string {

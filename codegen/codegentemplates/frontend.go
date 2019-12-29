@@ -70,6 +70,7 @@ export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForT
 		additional_confirmation: '{{EscapeForJsSingleQuote .AdditionalConfirmation}}',
 {{end}}		title: '{{EscapeForJsSingleQuote .Title}}',
 		crudNature: CrudNature.{{.CrudNature}},
+		info: {{if .Info}}[{{range .Info}}'{{EscapeForJsSingleQuote .}}',{{end}}]{{else}}[]{{end}},
 		fields: [
 {{.FieldsForTypeScript}}
 		],
