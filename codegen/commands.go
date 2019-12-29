@@ -71,6 +71,7 @@ type CommandFieldSpec struct {
 	Key                string `json:"key"`
 	Title              string `json:"title"`
 	Type               string `json:"type"`
+	Unit               string `json:"unit"`
 	ValidationRegex    string `json:"validation_regex"`
 	MaxLength          *int   `json:"max_length"`
 	Optional           bool   `json:"optional"`
@@ -276,8 +277,13 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 				}
 			}
 
+			unitJs := "null"
+			if fieldSpec.Unit != "" {
+				unitJs = fmt.Sprintf("'%s'", escapeStringInsideJsSingleQuotes(fieldSpec.Unit))
+			}
+
 			return fmt.Sprintf(
-				`{ Key: '%s', Title: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', ValidationRegex: '%s' },`,
+				`{ Key: '%s', Title: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', Unit: %s, ValidationRegex: '%s' },`,
 				fieldSpec.Key,
 				escapeStringInsideJsSingleQuotes(fieldSpec.Title),
 				!fieldSpec.Optional,
@@ -287,6 +293,7 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 				defVal,
 				escapeStringInsideJsSingleQuotes(fieldSpec.Help),
 				escapeStringInsideJsSingleQuotes(fieldSpec.Placeholder),
+				unitJs,
 				fieldSpec.ValidationRegex)
 		}
 
