@@ -84,4 +84,8 @@ const FrontendVersion = `// tslint:disable
 // WARNING: generated file
 
 export const version = '{{.Version}}';
+
+export function isDevVersion(): boolean {
+	return version === 'dev';
+}
 `
