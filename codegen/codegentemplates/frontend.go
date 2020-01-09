@@ -85,7 +85,5 @@ const FrontendVersion = `// tslint:disable
 
 export const version = '{{.Version}}';
 
-export function isDevVersion(): boolean {
-	return version === 'dev';
-}
+export const isDevVersion = {{if eq .Version "dev"}}true{{else}}false{{end}};
 `
