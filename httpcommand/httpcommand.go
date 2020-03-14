@@ -4,8 +4,8 @@ package httpcommand
 
 import (
 	"encoding/json"
-	"github.com/function61/eventkit/command"
 	"github.com/function61/eventhorizon/pkg/ehevent"
+	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/eventlog"
 	"github.com/function61/gokit/httpauth"
 	"net/http"
