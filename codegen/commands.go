@@ -128,7 +128,7 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 	}
 	`,
 				c.Key,
-				c.ValidationRegex,
+				strings.Replace(c.ValidationRegex, `\`, `\\`, -1),
 				c.Key)
 		}
 
