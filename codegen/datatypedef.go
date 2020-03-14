@@ -108,12 +108,12 @@ func stringBoolMapKeysSorted(sbm map[string]bool) []string {
 	keys := make([]string, len(sbm))
 
 	i := 0
-	for key, _ := range sbm {
+	for key := range sbm {
 		keys[i] = key
 		i++
 	}
 
-	sort.Sort(sort.StringSlice(keys))
+	sort.Strings(keys)
 
 	return keys
 }

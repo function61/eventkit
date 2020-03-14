@@ -75,7 +75,7 @@ func (e *EndpointDefinition) GoPath() string {
 	return strings.NewReplacer(replacements...).Replace(e.Path)
 }
 
-var routePlaceholderParseRe = regexp.MustCompile("\\{([a-zA-Z0-9]+)\\}")
+var routePlaceholderParseRe = regexp.MustCompile(`\{([a-zA-Z0-9]+)\}`)
 
 // "/users/{id}/addresses/{idx}" => "id: string, idx: string"
 func (e *EndpointDefinition) TypescriptArgs() string {
