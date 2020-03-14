@@ -3,19 +3,19 @@ package command
 
 import (
 	"context"
-	"github.com/function61/eventkit/event"
+	"github.com/function61/eventhorizon/pkg/ehevent"
 	"net/http"
 )
 
 type Ctx struct {
 	Ctx context.Context // Go's cancellation context
 
-	Meta event.EventMeta
+	Meta ehevent.EventMeta
 
 	RemoteAddr string
 	UserAgent  string
 
-	raisedEvents []event.Event
+	raisedEvents []ehevent.Event
 
 	cookies []*http.Cookie
 
@@ -25,7 +25,7 @@ type Ctx struct {
 
 func NewCtx(
 	ctx context.Context,
-	meta event.EventMeta,
+	meta ehevent.EventMeta,
 	remoteAddr string,
 	userAgent string,
 ) *Ctx {
@@ -34,16 +34,16 @@ func NewCtx(
 		Meta:         meta,
 		RemoteAddr:   remoteAddr,
 		UserAgent:    userAgent,
-		raisedEvents: []event.Event{},
+		raisedEvents: []ehevent.Event{},
 		cookies:      []*http.Cookie{},
 	}
 }
 
-func (c *Ctx) GetRaisedEvents() []event.Event {
+func (c *Ctx) GetRaisedEvents() []ehevent.Event {
 	return c.raisedEvents
 }
 
-func (c *Ctx) RaisesEvent(event event.Event) {
+func (c *Ctx) RaisesEvent(event ehevent.Event) {
 	c.raisedEvents = append(c.raisedEvents, event)
 }
 

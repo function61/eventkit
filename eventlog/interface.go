@@ -1,10 +1,10 @@
-// Provides an interface for persisting Events
 package eventlog
 
 import (
-	"github.com/function61/eventkit/event"
+	"github.com/function61/eventhorizon/pkg/ehevent"
 )
 
+// DEPRECATED: will soon be removed
 type Log interface {
-	Append(events []event.Event) error
+	Append(events []ehevent.Event) error
 }

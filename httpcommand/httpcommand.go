@@ -5,7 +5,7 @@ package httpcommand
 import (
 	"encoding/json"
 	"github.com/function61/eventkit/command"
-	"github.com/function61/eventkit/event"
+	"github.com/function61/eventhorizon/pkg/ehevent"
 	"github.com/function61/eventkit/eventlog"
 	"github.com/function61/gokit/httpauth"
 	"net/http"
@@ -89,7 +89,7 @@ func Serve(
 
 	ctx := command.NewCtx(
 		r.Context(),
-		event.Meta(time.Now(), userId),
+		ehevent.Meta(time.Now(), userId),
 		r.RemoteAddr,
 		r.Header.Get("User-Agent"))
 
@@ -126,9 +126,7 @@ func InvokeSkippingAuthorization(
 		return badRequest("command_failed", errInvoke.Error())
 	}
 
-	raisedEvents := ctx.GetRaisedEvents()
-
-	if err := eventLog.Append(raisedEvents); err != nil {
+	if err := eventLog.Append(ctx.GetRaisedEvents()); err != nil {
 		return customError("event_append_failed", err.Error(), http.StatusInternalServerError)
 	}
 
