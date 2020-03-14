@@ -3,7 +3,6 @@
 package httpcommand
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/event"
@@ -89,7 +88,7 @@ func Serve(
 	}
 
 	ctx := command.NewCtx(
-		context.TODO(),
+		r.Context(),
 		event.Meta(time.Now(), userId),
 		r.RemoteAddr,
 		r.Header.Get("User-Agent"))
