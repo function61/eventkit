@@ -55,8 +55,8 @@ func Serve(
 	r *http.Request,
 	mwares httpauth.MiddlewareChainMap,
 	commandName string,
-	allocators command.AllocatorMap,
-	handlers interface{},
+	allocators command.Allocators,
+	invoker command.Invoker,
 	eventLog eventlog.Log,
 ) *HttpError {
 	allocator, commandExists := allocators[commandName]
@@ -93,7 +93,7 @@ func Serve(
 		r.RemoteAddr,
 		r.Header.Get("User-Agent"))
 
-	if herr := InvokeSkippingAuthorization(cmdStruct, ctx, handlers, eventLog); herr != nil {
+	if herr := InvokeSkippingAuthorization(cmdStruct, ctx, invoker, eventLog); herr != nil {
 		return herr
 	}
 
@@ -115,14 +115,14 @@ func Serve(
 func InvokeSkippingAuthorization(
 	cmdStruct command.Command,
 	ctx *command.Ctx,
-	handlers interface{},
+	invoker command.Invoker,
 	eventLog eventlog.Log,
 ) *HttpError {
 	if errValidate := cmdStruct.Validate(); errValidate != nil {
 		return badRequest("command_validation_failed", errValidate.Error())
 	}
 
-	if errInvoke := cmdStruct.Invoke(ctx, handlers); errInvoke != nil {
+	if errInvoke := invoker.Invoke(cmdStruct, ctx); errInvoke != nil {
 		return badRequest("command_failed", errInvoke.Error())
 	}
 

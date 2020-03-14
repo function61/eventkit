@@ -7,6 +7,22 @@ import (
 	"net/http"
 )
 
+type Command interface {
+	Key() string
+	Validate() error
+	MiddlewareChain() string
+}
+
+// can invoke any command in typesafe manner
+type Invoker interface {
+	Invoke(cmdGeneric Command, ctx *Ctx) error
+}
+
+// map keyed by command name (command.Key()) values are functions that allocates a new
+// specific command struct
+type Allocators map[string]func() Command
+
+// context for invoking command
 type Ctx struct {
 	Ctx context.Context // Go's cancellation context
 
@@ -62,14 +78,3 @@ func (c *Ctx) GetCreatedRecordId() string {
 func (c *Ctx) Cookies() []*http.Cookie {
 	return c.cookies
 }
-
-type Command interface {
-	Key() string
-	Validate() error
-	MiddlewareChain() string
-	Invoke(ctx *Ctx, handlers interface{}) error
-}
-
-// map keyed by command name (command.Key()) values are functions that allocates a new
-// specific command struct
-type AllocatorMap map[string]func() Command

@@ -13,10 +13,31 @@ import (
 {{if .CommandsImports.Date}}	"github.com/function61/eventkit/guts"{{end}}
 )
 
+// handlers
+
 type CommandHandlers interface { {{range .CommandSpecs}}
 	{{.AsGoStructName}}(*{{.AsGoStructName}}, *command.Ctx) error{{end}}
 }
 
+// invoker
+
+func CommandInvoker(handlers CommandHandlers) command.Invoker {
+	return &invoker{handlers}
+}
+
+type invoker struct {
+	handlers CommandHandlers
+}
+
+func (i *invoker) Invoke(cmdGeneric command.Command, ctx *command.Ctx) error {
+	switch cmd := cmdGeneric.(type) { {{range .CommandSpecs}}
+	case *{{.AsGoStructName}}:
+		return i.handlers.{{.AsGoStructName}}(cmd, ctx){{end}}
+	default:
+		// should not ever happen, because this is asserted in httpcommand
+		return fmt.Errorf("unknown command: " + cmdGeneric.Key())
+	}
+}
 
 // structs
 
@@ -31,14 +52,11 @@ func (x *{{.AsGoStructName}}) Validate() error {
 
 func (x *{{.AsGoStructName}}) MiddlewareChain() string { return "{{.MiddlewareChain}}" }
 func (x *{{.AsGoStructName}}) Key() string { return "{{.Command}}" }
-func (x *{{.AsGoStructName}}) Invoke(ctx *command.Ctx, handlers interface{}) error {
-	return handlers.(CommandHandlers).{{.AsGoStructName}}(x, ctx)
-}
 {{end}}
 
-// builders
+// allocators
 
-var Allocators = command.AllocatorMap{
+var Allocators = command.Allocators{
 {{range .CommandSpecs}}
 	"{{.Command}}": func() command.Command { return &{{.AsGoStructName}}{} },{{end}}
 }
