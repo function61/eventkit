@@ -72,7 +72,7 @@ func (v *Visitor) AsGoCode() string {
 
 func VisitForGoStructs(e *EventSpec, visitor *Visitor) *GoStruct {
 	eventFields := []GoStructField{
-		GoStructField{Name: "meta", Type: "*event.EventMeta"},
+		GoStructField{Name: "meta", Type: "*ehevent.EventMeta"},
 	}
 
 	for _, fieldSpec := range e.Fields {
@@ -177,7 +177,7 @@ func ProcessEvents(file *DomainFile) ([]EventDefForTpl, string) {
 			ctorAssignments = append(ctorAssignments, ctorArg+": "+ctorArg+",")
 		}
 
-		ctorArgs = append(ctorArgs, "meta event.EventMeta")
+		ctorArgs = append(ctorArgs, "meta ehevent.EventMeta")
 
 		eventDefs = append(eventDefs, EventDefForTpl{
 			EventKey:        eventSpec.Event,

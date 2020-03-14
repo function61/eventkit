@@ -75,14 +75,14 @@ const BackendEventDefinitions = `package {{.ModuleId}}
 import (
 {{if .EventsImports.DateTime}}	"time"
 {{end}}{{if .EventsImports.Date}}	"github.com/function61/eventkit/guts"
-{{end}}	"github.com/function61/eventkit/event"
+{{end}}	"github.com/function61/eventhorizon/pkg/ehevent"
 )
 
 // WARNING: generated file
 
-var Allocators = event.AllocatorMap{
+var EventTypes = ehevent.Allocators{
 {{range .EventDefs}}
-	"{{.EventKey}}": func() event.Event { return &{{.GoStructName}}{meta: &event.EventMeta{}} },{{end}}
+	"{{.EventKey}}": func() ehevent.Event { return &{{.GoStructName}}{meta: &ehevent.EventMeta{}} },{{end}}
 }
 
 
@@ -101,23 +101,20 @@ func New{{.GoStructName}}({{.CtorArgs}}) *{{.GoStructName}} {
 {{end}}
 
 {{range .EventDefs}}
-func (e *{{.GoStructName}}) Meta() *event.EventMeta { return e.meta }{{end}}
+func (e *{{.GoStructName}}) Meta() *ehevent.EventMeta { return e.meta }{{end}}
 
 {{range .EventDefs}}
 func (e *{{.GoStructName}}) MetaType() string { return "{{.EventKey}}" }{{end}}
-
-{{range .EventDefs}}
-func (e *{{.GoStructName}}) Serialize() string { return e.meta.Serialize(e) }{{end}}
 
 // interface
 
 type EventListener interface { {{range .EventDefs}}
 	Apply{{.GoStructName}}(*{{.GoStructName}}) error{{end}}
 
-	HandleUnknownEvent(event event.Event) error
+	HandleUnknownEvent(event ehevent.Event) error
 }
 
-func DispatchEvent(event event.Event, listener EventListener) error {
+func DispatchEvent(event ehevent.Event, listener EventListener) error {
 	switch e := event.(type) { {{range .EventDefs}}
 	case *{{.GoStructName}}:
 		return listener.Apply{{.GoStructName}}(e){{end}}
