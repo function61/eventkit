@@ -150,9 +150,8 @@ func (c *CommandFieldSpec) AsValidationSnippet(module *Module) string {
 			compareTo := "nil"
 			if module.HasEnum(goType) { // string enum
 				compareTo = `""`
-			} else {
-				// struct (nil)
 			}
+			// else: struct (nil)
 
 			emptySnippet = fmt.Sprintf(
 				`if x.%s == %s {
