@@ -81,10 +81,6 @@ type CommandFieldSpec struct {
 	Placeholder        string `json:"placeholder"`
 }
 
-func (c *CommandFieldSpec) AsGoField() string {
-	return fmt.Sprintf("%s %s `json:\"%s\"`", c.Key, c.AsGoType(), c.Key)
-}
-
 func (c *CommandFieldSpec) AsValidationSnippet() string {
 	goType := c.AsGoType()
 
@@ -224,23 +220,6 @@ func (c *CommandFieldSpec) Validate() error {
 	}
 
 	return nil
-}
-
-func (c *CommandSpec) MakeStruct() string {
-	template := `type %s struct {
-	%s
-}`
-
-	fieldLines := []string{}
-
-	for _, field := range c.Fields {
-		fieldLines = append(fieldLines, field.AsGoField())
-	}
-
-	return fmt.Sprintf(
-		template,
-		c.AsGoStructName(),
-		strings.Join(fieldLines, "\n\t"))
 }
 
 // returns Go code (as a string) for validating command inputs

@@ -42,7 +42,9 @@ func (i *invoker) Invoke(cmdGeneric command.Command, ctx *command.Ctx) error {
 // structs
 
 {{range .Module.Commands}}
-{{.MakeStruct}}
+type {{.AsGoStructName}} struct { {{range .Fields}}
+	{{.Key}} {{.AsGoType}} ` + "`json:\"{{.Key}}\"`" + `{{end}}
+}
 
 func (x *{{.AsGoStructName}}) Validate() error {
 	{{.MakeValidation}}
