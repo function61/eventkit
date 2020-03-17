@@ -18,9 +18,9 @@ export enum {{.Name}} {
 	{{.Key}} = '{{.GoValue}}',{{end}}
 }
 {{end}}
-{{range .ApplicationTypes.StringConsts}}
+{{range .Module.Types.StringConsts}}
 export const {{.Key}} = '{{EscapeForJsSingleQuote .Value}}';{{end}}
-{{range .ApplicationTypes.Types}}
+{{range .Module.Types.Types}}
 {{.AsTypeScriptCode}}
 {{end}}
 `
@@ -31,15 +31,15 @@ const FrontendRestEndpoints = `// tslint:disable
 // WHY: wouldn't make sense complicating code generation to check
 // if we need template string or not in path string
 
-import { {{range .ApplicationTypes.EndpointsProducesAndConsumesTypescriptTypes}}
+import { {{range .Module.Types.EndpointsProducesAndConsumesTypescriptTypes}}
 	{{.}},{{end}}
-} from '{{$.Opts.FrontendModulePrefix}}{{.ModulePath}}_types';
+} from '{{$.Opts.FrontendModulePrefix}}{{.Module.Path}}_types';
 import {
 	getJson,
 {{if .AnyEndpointHasConsumes}}	postJson,{{end}}
 } from 'f61ui/httputil';
 
-{{range .ApplicationTypes.Endpoints}}
+{{range .Module.Types.Endpoints}}
 // {{.Path}}
 export function {{.Name}}({{.TypescriptArgs}}) {
 	return {{if .Consumes}}postJson<{{if .Consumes}}{{.Consumes.AsTypeScriptType}}{{else}}void{{end}}, {{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{else}}getJson<{{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{end}}(` + "`{{.TypescriptPath}}`" + `{{if .Consumes}}, body{{end}});
@@ -54,16 +54,16 @@ export function {{.Name}}Url({{.TypescriptArgs}}): string {
 const FrontendCommandDefinitions = `// tslint:disable
 // WARNING: generated file
 
-{{if .CommandSpecs.ImportedCustomFieldTypes}}import { {{range .CommandSpecs.ImportedCustomFieldTypes}}
+{{if .Module.Commands.ImportedCustomFieldTypes}}import { {{range .Module.Commands.ImportedCustomFieldTypes}}
 	{{.}},{{end}}
-} from '{{$.Opts.FrontendModulePrefix}}{{.ModulePath}}_types';{{end}}
+} from '{{$.Opts.FrontendModulePrefix}}{{.Module.Path}}_types';{{end}}
 import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from 'f61ui/commandtypes';
 {{if .CommandsImportsUi.Date}}import {dateRFC3339} from 'f61ui/types';
 {{end}}
 {{if .CommandsImportsUi.DateTime}}import {datetimeRFC3339} from 'f61ui/types';
 {{end}}
 
-{{range .CommandSpecs}}
+{{range .Module.Commands}}
 export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}settings: CommandSettings = {}): CommandDefinition {
 	return {
 		key: '{{.Command}}',{{if .AdditionalConfirmation}}

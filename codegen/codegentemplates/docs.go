@@ -6,7 +6,7 @@ const DocsEvents = `Each and every *Event* additionally has the following common
 - ID of the user that caused that event
 
 
-{{range .DomainSpecs.Events}}
+{{range .Module.Events.Events}}
 {{.Event}}
 -------
 
@@ -23,17 +23,17 @@ Changelog:
 {{end}}
 `
 
-const DocsTypes = `{{if .ApplicationTypes.StringConsts}}
+const DocsTypes = `{{if .Module.Types.StringConsts}}
 Constants
 ---------
 
 | const | value |
 |-------|-------|
-{{range .ApplicationTypes.StringConsts}}| {{.Key}} | {{.Value}} |
+{{range .Module.Types.StringConsts}}| {{.Key}} | {{.Value}} |
 {{end}}
 {{end}}
 
-{{range .ApplicationTypes.Enums}}
+{{range .Module.Types.Enums}}
 enum {{.Name}}
 ---------
 
@@ -41,7 +41,7 @@ enum {{.Name}}
 - {{.}}{{end}}
 {{end}}
 
-{{range .ApplicationTypes.Types}}
+{{range .Module.Types.Types}}
 {{.Name}}
 ---------
 
@@ -55,10 +55,10 @@ const DocsCommands = `Overview
 --------
 
 | Endpoint | Middleware | Title |
-|----------|------------|-------| {{range .CommandSpecs}}
+|----------|------------|-------| {{range .Module.Commands}}
 | POST /command/{{.Command}} | {{.MiddlewareChain}} | {{.Title}} | {{end}}
 
-{{range .CommandSpecs}}
+{{range .Module.Commands}}
 {{.Command}}
 ------------
 
@@ -74,10 +74,10 @@ const DocsRestEndpoints = `Overview
 
 | Path | Middleware | Input | Output | Notes |
 |------|------------|-------|--------|-------|
-{{range .ApplicationTypes.Endpoints}}| {{.HttpMethod}} {{.Path}} | {{.MiddlewareChain}} | {{if .Consumes}}{{.Consumes.AsTypeScriptType}}{{end}} | {{if .Produces}}{{.Produces.AsTypeScriptType}}{{end}} | {{.Description}} |
+{{range .Module.Types.Endpoints}}| {{.HttpMethod}} {{.Path}} | {{.MiddlewareChain}} | {{if .Consumes}}{{.Consumes.AsTypeScriptType}}{{end}} | {{if .Produces}}{{.Produces.AsTypeScriptType}}{{end}} | {{.Description}} |
 {{end}}
 
-{{range .ApplicationTypes.Endpoints}}
+{{range .Module.Types.Endpoints}}
 {{.HttpMethod}} {{.Path}}
 =========================
 

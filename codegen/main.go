@@ -21,9 +21,9 @@ type Module struct {
 	TypesFile        string
 
 	// computed state
-	EventsSpec *DomainFile
-	Types      *ApplicationTypesDefinition
-	Commands   *CommandSpecFile
+	Events   *DomainFile
+	Types    *ApplicationTypesDefinition
+	Commands *CommandSpecFile
 }
 
 var moduleIdFromModulePathRe = regexp.MustCompile("[^/]+$")
@@ -53,7 +53,7 @@ type FileToGenerate struct {
 
 func processModule(mod *Module, opts Opts) error {
 	// should be ok with nil data
-	mod.EventsSpec = &DomainFile{}
+	mod.Events = &DomainFile{}
 	mod.Types = &ApplicationTypesDefinition{}
 	mod.Commands = &CommandSpecFile{}
 
@@ -62,7 +62,7 @@ func processModule(mod *Module, opts Opts) error {
 	hasCommands := mod.CommandsSpecFile != ""
 
 	if hasEvents {
-		if err := jsonfile.Read(mod.EventsSpecFile, mod.EventsSpec, true); err != nil {
+		if err := jsonfile.Read(mod.EventsSpecFile, mod.Events, true); err != nil {
 			return err
 		}
 	}
@@ -88,7 +88,7 @@ func processModule(mod *Module, opts Opts) error {
 	hasRestEndpoints := len(mod.Types.Endpoints) > 0
 
 	// preprocessing
-	eventDefs, eventStructsAsGoCode := ProcessEvents(mod.EventsSpec)
+	eventDefs, eventStructsAsGoCode := ProcessEvents(mod.Events)
 
 	uniqueTypes := mod.Types.UniqueDatatypesFlattened()
 
@@ -100,7 +100,7 @@ func processModule(mod *Module, opts Opts) error {
 
 	eventsImports := NewImports()
 
-	for _, eventDef := range mod.EventsSpec.Events {
+	for _, eventDef := range mod.Events.Events {
 		for _, field := range eventDef.Fields {
 			for _, datatype := range flattenDatatype(&field.Type) {
 				switch datatype.NameRaw {
@@ -157,23 +157,19 @@ func processModule(mod *Module, opts Opts) error {
 	}
 
 	data := &TplData{
-		ModuleId:               mod.Id,
-		ModulePath:             mod.Path,
+		Module:                 mod,
 		Opts:                   opts,
 		AnyEndpointHasConsumes: anyEndpointHasConsumes,
 		TypesImports:           typesImports,
 		CommandsImports:        commandsImports,
 		CommandsImportsUi:      commandsImportsUi,
 		EventsImports:          eventsImports,
-		DomainSpecs:            mod.EventsSpec, // backwards compat
-		CommandSpecs:           mod.Commands,   // backwards compat
-		ApplicationTypes:       mod.Types,      // backwards compat
 		StringEnums:            ProcessStringEnums(mod.Types.Enums),
 		EventDefs:              eventDefs,
 		EventStructsAsGoCode:   eventStructsAsGoCode,
 	}
 
-	maybeRenderOne := func(expr bool, path string, template string) error {
+	renderOneIf := func(expr bool, path string, template string) error {
 		if !expr {
 			return nil
 		}
@@ -184,17 +180,17 @@ func processModule(mod *Module, opts Opts) error {
 	docs := opts.AutogenerateModuleDocs
 
 	return allOk(
-		maybeRenderOne(hasCommands, backendPath("commanddefinitions.gen.go"), codegentemplates.BackendCommandsDefinitions),
-		maybeRenderOne(hasCommands, frontendPath("commands.ts"), codegentemplates.FrontendCommandDefinitions),
-		maybeRenderOne(hasCommands && docs, docPath("commands.md"), codegentemplates.DocsCommands),
-		maybeRenderOne(hasEvents, backendPath("events.gen.go"), codegentemplates.BackendEventDefinitions),
-		maybeRenderOne(hasEvents && docs, docPath("events.md"), codegentemplates.DocsEvents),
-		maybeRenderOne(hasRestEndpoints, frontendPath("endpoints.ts"), codegentemplates.FrontendRestEndpoints),
-		maybeRenderOne(hasRestEndpoints, backendPath("restendpoints.gen.go"), codegentemplates.BackendRestEndpoints),
-		maybeRenderOne(hasRestEndpoints && docs, docPath("rest_endpoints.md"), codegentemplates.DocsRestEndpoints),
-		maybeRenderOne(hasTypes, backendPath("types.gen.go"), codegentemplates.BackendTypes),
-		maybeRenderOne(hasTypes, frontendPath("types.ts"), codegentemplates.FrontendDatatypes),
-		maybeRenderOne(hasTypes && docs, docPath("types.md"), codegentemplates.DocsTypes),
+		renderOneIf(hasCommands, backendPath("commanddefinitions.gen.go"), codegentemplates.BackendCommandsDefinitions),
+		renderOneIf(hasCommands, frontendPath("commands.ts"), codegentemplates.FrontendCommandDefinitions),
+		renderOneIf(hasCommands && docs, docPath("commands.md"), codegentemplates.DocsCommands),
+		renderOneIf(hasEvents, backendPath("events.gen.go"), codegentemplates.BackendEventDefinitions),
+		renderOneIf(hasEvents && docs, docPath("events.md"), codegentemplates.DocsEvents),
+		renderOneIf(hasRestEndpoints, frontendPath("endpoints.ts"), codegentemplates.FrontendRestEndpoints),
+		renderOneIf(hasRestEndpoints, backendPath("restendpoints.gen.go"), codegentemplates.BackendRestEndpoints),
+		renderOneIf(hasRestEndpoints && docs, docPath("rest_endpoints.md"), codegentemplates.DocsRestEndpoints),
+		renderOneIf(hasTypes, backendPath("types.gen.go"), codegentemplates.BackendTypes),
+		renderOneIf(hasTypes, frontendPath("types.ts"), codegentemplates.FrontendDatatypes),
+		renderOneIf(hasTypes && docs, docPath("types.md"), codegentemplates.DocsTypes),
 	)
 }
 

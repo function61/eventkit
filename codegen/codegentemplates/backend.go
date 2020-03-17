@@ -1,6 +1,6 @@
 package codegentemplates
 
-const BackendCommandsDefinitions = `package {{.ModuleId}}
+const BackendCommandsDefinitions = `package {{.Module.Id}}
 
 // WARNING: generated file
 
@@ -15,7 +15,7 @@ import (
 
 // handlers
 
-type CommandHandlers interface { {{range .CommandSpecs}}
+type CommandHandlers interface { {{range .Module.Commands}}
 	{{.AsGoStructName}}(*{{.AsGoStructName}}, *command.Ctx) error{{end}}
 }
 
@@ -30,7 +30,7 @@ type invoker struct {
 }
 
 func (i *invoker) Invoke(cmdGeneric command.Command, ctx *command.Ctx) error {
-	switch cmd := cmdGeneric.(type) { {{range .CommandSpecs}}
+	switch cmd := cmdGeneric.(type) { {{range .Module.Commands}}
 	case *{{.AsGoStructName}}:
 		return i.handlers.{{.AsGoStructName}}(cmd, ctx){{end}}
 	default:
@@ -41,7 +41,7 @@ func (i *invoker) Invoke(cmdGeneric command.Command, ctx *command.Ctx) error {
 
 // structs
 
-{{range .CommandSpecs}}
+{{range .Module.Commands}}
 {{.MakeStruct}}
 
 func (x *{{.AsGoStructName}}) Validate() error {
@@ -57,7 +57,7 @@ func (x *{{.AsGoStructName}}) Key() string { return "{{.Command}}" }
 // allocators
 
 var Allocators = command.Allocators{
-{{range .CommandSpecs}}
+{{range .Module.Commands}}
 	"{{.Command}}": func() command.Command { return &{{.AsGoStructName}}{} },{{end}}
 }
 
@@ -88,7 +88,7 @@ func fieldLengthValidationError(fieldName string, maxLength int, got int) error 
 }
 `
 
-const BackendEventDefinitions = `package {{.ModuleId}}
+const BackendEventDefinitions = `package {{.Module.Id}}
 
 import (
 {{if .EventsImports.DateTime}}	"time"
@@ -142,7 +142,7 @@ func DispatchEvent(event ehevent.Event, listener EventListener) error {
 }
 `
 
-const BackendTypes = `package {{.ModuleId}}
+const BackendTypes = `package {{.Module.Id}}
 
 import ( {{if .StringEnums}}
 	"fmt"
@@ -154,7 +154,7 @@ import ( {{if .StringEnums}}
 {{end}}
 )
 
-{{range .ApplicationTypes.Types}}
+{{range .Module.Types.Types}}
 {{.AsToGoCode}}
 {{end}}
 
@@ -206,12 +206,12 @@ func {{$enum.Name}}Exhaustive{{$enum.MembersDigest}}(in {{$enum.Name}}) {{$enum.
 }
 {{end}}
 
-{{range .ApplicationTypes.StringConsts}}
+{{range .Module.Types.StringConsts}}
 const {{.Key}} = "{{.Value}}";
 {{end}}
 `
 
-const BackendRestEndpoints = `package {{.ModuleId}}
+const BackendRestEndpoints = `package {{.Module.Id}}
 
 import (
 	"encoding/json"
@@ -220,13 +220,13 @@ import (
 	"net/url"
 )
 
-type HttpHandlers interface { {{range .ApplicationTypes.Endpoints}}
+type HttpHandlers interface { {{range .Module.Types.Endpoints}}
 	{{UppercaseFirst .Name}}(rctx *httpauth.RequestContext, {{if .Consumes}}input {{.Consumes.AsGoType}}, {{end}}w http.ResponseWriter, r *http.Request){{if .Produces}} *{{.Produces.AsGoType}}{{end}}{{end}}
 }
 
 // the following generated code brings type safety from all the way to the
 // backend-frontend path (input/output structs and endpoint URLs) to the REST API
-func RegisterRoutes(handlers HttpHandlers, mwares httpauth.MiddlewareChainMap, register func(method string, path string, fn http.HandlerFunc)) { {{range .ApplicationTypes.Endpoints}}
+func RegisterRoutes(handlers HttpHandlers, mwares httpauth.MiddlewareChainMap, register func(method string, path string, fn http.HandlerFunc)) { {{range .Module.Types.Endpoints}}
 	register("{{.HttpMethod}}", "{{StripQueryFromUrl .Path}}", func(w http.ResponseWriter, r *http.Request) {
 		rctx := mwares["{{.MiddlewareChain}}"](w, r)
 		if rctx == nil {
@@ -276,7 +276,7 @@ func NewRestClientUrlBuilder(baseUrl string) *RestClientUrlBuilder {
 	return &RestClientUrlBuilder{baseUrl}
 }
 
-{{range .ApplicationTypes.Endpoints}}
+{{range .Module.Types.Endpoints}}
 // {{.Path}}
 func (r *RestClientUrlBuilder) {{UppercaseFirst .Name}}({{.GoArgs}}) string {
 	return r.baseUrl + "{{.GoPath}}"

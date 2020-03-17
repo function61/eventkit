@@ -51,17 +51,13 @@ func NewImports() Imports {
 
 // this is passed as data to each template that we'll render
 type TplData struct {
-	ModuleId               string
-	ModulePath             string
+	Module                 *Module
 	Opts                   Opts
 	AnyEndpointHasConsumes bool
 	TypesImports           Imports
 	CommandsImports        Imports
 	CommandsImportsUi      Imports // UI only needs types that are mentioned in ctor
 	EventsImports          Imports
-	DomainSpecs            *DomainFile
-	CommandSpecs           *CommandSpecFile
-	ApplicationTypes       *ApplicationTypesDefinition
 	StringEnums            []ProcessedStringEnum
 	EventStructsAsGoCode   string
 	EventDefs              []EventDefForTpl
