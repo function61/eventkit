@@ -16,10 +16,17 @@ const (
 	CreatedRecordIdHeaderKey = "x-created-record-id"
 )
 
+var noResponse = NewHttpError(0, "", "")
+
+// error that is sent as a JSON-formatted error
 type HttpError struct {
 	StatusCode  int // if 0, means errored but error response already sent by middleware
 	ErrorCode   string
 	Description string
+}
+
+func NewHttpError(statusCode int, errorCode string, description string) *HttpError {
+	return &HttpError{statusCode, errorCode, description}
 }
 
 func (r *HttpError) Error() string {
@@ -35,19 +42,7 @@ func (r *HttpError) ErrorResponseAlreadySentByMiddleware() bool {
 }
 
 func badRequest(errorCode string, description string) *HttpError {
-	return customError(errorCode, description, http.StatusBadRequest)
-}
-
-func noResponse() *HttpError {
-	return &HttpError{}
-}
-
-func customError(errorCode string, description string, statusCode int) *HttpError {
-	return &HttpError{
-		ErrorCode:   errorCode,
-		Description: description,
-		StatusCode:  statusCode,
-	}
+	return NewHttpError(http.StatusBadRequest, errorCode, description)
 }
 
 func Serve(
@@ -69,7 +64,7 @@ func Serve(
 	middlewareChain := mwares[cmdStruct.MiddlewareChain()]
 	reqCtx := middlewareChain(w, r)
 	if reqCtx == nil {
-		return noResponse() // middleware dealt with error response
+		return noResponse // middleware dealt with error response
 	}
 
 	userId := ""
@@ -123,11 +118,16 @@ func InvokeSkippingAuthorization(
 	}
 
 	if errInvoke := invoker.Invoke(cmdStruct, ctx); errInvoke != nil {
-		return badRequest("command_failed", errInvoke.Error())
+		// see if returned error is already an *HttpError
+		if httpErr, is := errInvoke.(*HttpError); is {
+			return httpErr // use as-is
+		} else {
+			return badRequest("command_failed", errInvoke.Error())
+		}
 	}
 
 	if err := eventLog.Append(ctx.GetRaisedEvents()); err != nil {
-		return customError("event_append_failed", err.Error(), http.StatusInternalServerError)
+		return NewHttpError(http.StatusInternalServerError, "event_append_failed", err.Error())
 	}
 
 	return nil
