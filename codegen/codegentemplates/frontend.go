@@ -72,7 +72,7 @@ export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForT
 		crudNature: CrudNature.{{.CrudNature}},
 		info: {{if .Info}}[{{range .Info}}'{{EscapeForJsSingleQuote .}}',{{end}}]{{else}}[]{{end}},
 		fields: [
-{{.FieldsForTypeScript}}
+{{.FieldsForTypeScript $}}
 		],
 		settings: settings,
 	};

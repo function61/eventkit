@@ -43,11 +43,11 @@ func (i *invoker) Invoke(cmdGeneric command.Command, ctx *command.Ctx) error {
 
 {{range .Module.Commands}}
 type {{.AsGoStructName}} struct { {{range .Fields}}
-	{{.Key}} {{.AsGoType}} ` + "`json:\"{{.Key}}\"`" + `{{end}}
+	{{.Key}} {{.AsGoType $.Module}} ` + "`json:\"{{.Key}}\"`" + `{{end}}
 }
 
 func (x *{{.AsGoStructName}}) Validate() error {
-	{{.MakeValidation}}
+	{{.MakeValidation $.Module}}
 
 	return nil
 }

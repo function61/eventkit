@@ -9,9 +9,9 @@ import (
 
 type CommandSpecFile []*CommandSpec
 
-func (c *CommandSpecFile) Validate() error {
+func (c *CommandSpecFile) Validate(module *Module) error {
 	for _, spec := range *c {
-		if err := spec.Validate(); err != nil {
+		if err := spec.Validate(module); err != nil {
 			return err
 		}
 	}
@@ -58,9 +58,9 @@ func (c *CommandSpec) AsGoStructName() string {
 	return titleCased
 }
 
-func (c *CommandSpec) Validate() error {
+func (c *CommandSpec) Validate(module *Module) error {
 	for _, field := range c.Fields {
-		if err := field.Validate(); err != nil {
+		if err := field.Validate(module); err != nil {
 			return err
 		}
 	}
@@ -81,8 +81,8 @@ type CommandFieldSpec struct {
 	Placeholder        string `json:"placeholder"`
 }
 
-func (c *CommandFieldSpec) AsValidationSnippet() string {
-	goType := c.AsGoType()
+func (c *CommandFieldSpec) AsValidationSnippet(module *Module) string {
+	goType := c.AsGoType(module)
 
 	if goType == "string" || goType == "password" {
 		maxLen := 128
@@ -143,16 +143,24 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 	} else if goType == "bool" || goType == "int" || goType == "guts.Date" {
 		// presence check not possible for these types
 		return ""
-	} else if isCustomType(goType) { // assuming string-enum
+	} else if isCustomType(goType) {
 		emptySnippet := ""
 
 		if !c.Optional {
+			compareTo := "nil"
+			if module.HasEnum(goType) { // string enum
+				compareTo = `""`
+			} else {
+				// struct (nil)
+			}
+
 			emptySnippet = fmt.Sprintf(
-				`if x.%s == "" {
+				`if x.%s == %s {
 		return fieldEmptyValidationError("%s")
 	}
 	`,
 				c.Key,
+				compareTo,
 				c.Key)
 		}
 
@@ -162,7 +170,7 @@ func (c *CommandFieldSpec) AsValidationSnippet() string {
 	}
 }
 
-func (c *CommandFieldSpec) AsGoType() string {
+func (c *CommandFieldSpec) AsGoType(module *Module) string {
 	switch c.Type {
 	case "text":
 		return "string"
@@ -178,7 +186,13 @@ func (c *CommandFieldSpec) AsGoType() string {
 		return "guts.Date"
 	default:
 		if isCustomType(c.Type) {
-			return c.Type
+			if module.HasEnum(c.Type) {
+				return c.Type
+			} else { // custom struct
+				// intentionally always a pointer because server-side required validation
+				// is easier this way
+				return "*" + c.Type
+			}
 		}
 
 		return ""
@@ -203,19 +217,23 @@ func (c *CommandFieldSpec) AsTsType() string {
 		return "datetimeRFC3339"
 	default:
 		if isCustomType(c.Type) {
-			return c.Type
+			if c.Optional {
+				return c.Type + " | null"
+			} else {
+				return c.Type
+			}
 		}
 
 		return ""
 	}
 }
 
-func (c *CommandFieldSpec) Validate() error {
+func (c *CommandFieldSpec) Validate(module *Module) error {
 	if c.Type == "" {
 		c.Type = "text"
 	}
 
-	if c.AsGoType() == "" || c.AsTsType() == "" {
+	if c.AsGoType(module) == "" || c.AsTsType() == "" {
 		return errors.New("field " + c.Key + " has invalid type: " + c.Type)
 	}
 
@@ -223,11 +241,11 @@ func (c *CommandFieldSpec) Validate() error {
 }
 
 // returns Go code (as a string) for validating command inputs
-func (c *CommandSpec) MakeValidation() string {
+func (c *CommandSpec) MakeValidation(module *Module) string {
 	validationSnippets := []string{}
 
 	for _, field := range c.Fields {
-		validationSnippet := field.AsValidationSnippet()
+		validationSnippet := field.AsValidationSnippet(module)
 		if validationSnippet == "" {
 			continue
 		}
@@ -238,7 +256,7 @@ func (c *CommandSpec) MakeValidation() string {
 	return strings.Join(validationSnippets, "\n\t")
 }
 
-func (c *CommandSpec) FieldsForTypeScript() string {
+func (c *CommandSpec) FieldsForTypeScript(tplData *TplData) string {
 	fields := []string{}
 
 	for _, fieldSpec := range c.Fields {
@@ -291,8 +309,12 @@ func (c *CommandSpec) FieldsForTypeScript() string {
 		case "date":
 			fieldSerialized = fieldToTypescript(fieldSpec, "Date", "DefaultValueString")
 		default:
-			if isCustomType(fieldSpec.Type) { // assuming string-enum (modeling it as Text ui-input for now..)
-				fieldSerialized = fieldToTypescript(fieldSpec, "Text", "DefaultValueString")
+			if isCustomType(fieldSpec.Type) {
+				if tplData.Module.HasEnum(fieldSpec.Type) { // enums as string
+					fieldSerialized = fieldToTypescript(fieldSpec, "Text", "DefaultValueString")
+				} else {
+					fieldSerialized = fieldToTypescript(fieldSpec, "Any", "DefaultValueAny")
+				}
 			} else {
 				panic(fmt.Errorf("Unsupported field type for UI: %s", fieldSpec.Type))
 			}

@@ -26,6 +26,16 @@ type Module struct {
 	Commands *CommandSpecFile
 }
 
+func (m *Module) HasEnum(name string) bool {
+	for _, enumDef := range m.Types.Enums {
+		if enumDef.Name == name {
+			return true
+		}
+	}
+
+	return false
+}
+
 var moduleIdFromModulePathRe = regexp.MustCompile("[^/]+$")
 
 func NewModule(
@@ -80,7 +90,7 @@ func processModule(mod *Module, opts Opts) error {
 		if err := jsonfile.Read(mod.CommandsSpecFile, mod.Commands, true); err != nil {
 			return err
 		}
-		if err := mod.Commands.Validate(); err != nil {
+		if err := mod.Commands.Validate(mod); err != nil {
 			return err
 		}
 	}
