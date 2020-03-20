@@ -19,11 +19,13 @@ type Module struct {
 	EventsSpecFile   string
 	CommandsSpecFile string
 	TypesFile        string
+	UiRoutesFile     string
 
 	// computed state
 	Events   *DomainFile
 	Types    *ApplicationTypesDefinition
 	Commands *CommandSpecFile
+	UiRoutes []uiRouteSpec
 }
 
 func (m *Module) HasEnum(name string) bool {
@@ -43,6 +45,7 @@ func NewModule(
 	typesFile string,
 	eventsSpecFile string,
 	commandSpecFile string,
+	uiRoutesFile string,
 ) *Module {
 	// "vstoserver/vstotypes" => "vstotypes"
 	id := moduleIdFromModulePathRe.FindStringSubmatch(modulePath)[0]
@@ -53,6 +56,7 @@ func NewModule(
 		EventsSpecFile:   eventsSpecFile,
 		CommandsSpecFile: commandSpecFile,
 		TypesFile:        typesFile,
+		UiRoutesFile:     uiRoutesFile,
 	}
 }
 
@@ -70,6 +74,7 @@ func processModule(mod *Module, opts Opts) error {
 	hasTypes := mod.TypesFile != ""
 	hasEvents := mod.EventsSpecFile != ""
 	hasCommands := mod.CommandsSpecFile != ""
+	hasUiRoutes := mod.UiRoutesFile != ""
 
 	if hasEvents {
 		if err := jsonfile.Read(mod.EventsSpecFile, mod.Events, true); err != nil {
@@ -91,6 +96,12 @@ func processModule(mod *Module, opts Opts) error {
 			return err
 		}
 		if err := mod.Commands.Validate(mod); err != nil {
+			return err
+		}
+	}
+
+	if hasUiRoutes {
+		if err := jsonfile.Read(mod.UiRoutesFile, &mod.UiRoutes, true); err != nil {
 			return err
 		}
 	}
@@ -201,6 +212,8 @@ func processModule(mod *Module, opts Opts) error {
 		renderOneIf(hasTypes, backendPath("types.gen.go"), codegentemplates.BackendTypes),
 		renderOneIf(hasTypes, frontendPath("types.ts"), codegentemplates.FrontendDatatypes),
 		renderOneIf(hasTypes && docs, docPath("types.md"), codegentemplates.DocsTypes),
+		renderOneIf(hasUiRoutes, backendPath("ui-routes.gen.go"), codegentemplates.BackendUiRoutes),
+		renderOneIf(hasUiRoutes, frontendPath("uiroutes.ts"), codegentemplates.FrontendUiRoutes),
 	)
 }
 

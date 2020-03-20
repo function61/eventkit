@@ -11,6 +11,7 @@ import (
 
 func WriteTemplateFile(filename string, data interface{}, templateString string) error {
 	templateFuncs := template.FuncMap{
+		"add":                    func(a, b int) int { return a + b },
 		"StripQueryFromUrl":      stripQueryFromUrl,
 		"UppercaseFirst":         func(input string) string { return strings.ToUpper(input[0:1]) + input[1:] },
 		"EscapeForJsSingleQuote": func(input string) string { return strings.ReplaceAll(input, `'`, `\'`) },
