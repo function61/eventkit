@@ -2,20 +2,14 @@ package codegen
 
 import (
 	"fmt"
+	"github.com/function61/gokit/atomicfilewrite"
+	"io"
 	"net/url"
-	"os"
 	"strings"
 	"text/template"
 )
 
 func WriteTemplateFile(filename string, data interface{}, templateString string) error {
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
 	templateFuncs := template.FuncMap{
 		"StripQueryFromUrl":      stripQueryFromUrl,
 		"UppercaseFirst":         func(input string) string { return strings.ToUpper(input[0:1]) + input[1:] },
@@ -27,11 +21,13 @@ func WriteTemplateFile(filename string, data interface{}, templateString string)
 		return fmt.Errorf("WriteTemplateFile Parse %s: %v", filename, err)
 	}
 
-	if err := tpl.Execute(file, data); err != nil {
-		return fmt.Errorf("WriteTemplateFile %s: %v", filename, err)
-	}
+	return atomicfilewrite.Write(filename, func(file io.Writer) error {
+		if err := tpl.Execute(file, data); err != nil {
+			return fmt.Errorf("WriteTemplateFile %s: %w", filename, err)
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // "/search?q={stuff}" => "/search"
