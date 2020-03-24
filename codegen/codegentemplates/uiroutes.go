@@ -44,14 +44,10 @@ export function {{.Id}}Match(path: string, query: queryParams): {{if .HasOpts}}{
 	if (matches == null) {
 		return null;
 	}
-{{range .QueryPlaceholders}}
-	if (!query.{{.}}) {
-		return null;
-	}{{end}}
 
 	return { {{range $idx, $key := .PathPlaceholders}}
 		{{$key}}: matches[{{add $idx 1}}],{{end}}{{range .QueryPlaceholders}}
-		{{.}}: query.{{.}},{{end}}
+		{{.}}: query.{{.}} || '',{{end}}
 	};
 }
 
