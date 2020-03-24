@@ -36,11 +36,8 @@ func (u *uiRouteSpec) QueryPlaceholders() []string {
 
 func (u *uiRouteSpec) placeholders(pathOrQuery string) []string {
 	placeholders := []string{}
-
-	if matches := routePlaceholderParseRe.FindStringSubmatch(pathOrQuery); matches != nil {
-		for _, match := range matches[1:] {
-			placeholders = append(placeholders, removeBraces(match))
-		}
+	for _, match := range routePlaceholderParseRe.FindAllStringSubmatch(pathOrQuery, -1) {
+		placeholders = append(placeholders, match[1])
 	}
 
 	return placeholders
