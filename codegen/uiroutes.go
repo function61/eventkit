@@ -83,7 +83,7 @@ func (u *uiRouteSpec) Query() string {
 }
 
 func (u *uiRouteSpec) TsPath() string {
-	return routePlaceholderParseRe.ReplaceAllStringFunc(u.Path, func(match string) string {
+	return routePlaceholderParseRe.ReplaceAllStringFunc(u.PathWithoutQuery(), func(match string) string {
 		// "{id}" => "id"
 		placeholder := removeBraces(match)
 

@@ -15,7 +15,7 @@ func RegisterUiRoutes(routes *mux.Router, uiHandler http.HandlerFunc) { {{range 
 const FrontendUiRoutes = `// tslint:disable
 // WARNING: generated file
 
-import { parseQueryParams, queryParams } from 'f61ui/httputil';
+import { parseQueryParams, queryParams, makeQueryParams } from 'f61ui/httputil';
 
 export interface RouteHandlers { {{range .Module.UiRoutes}}
 	{{.Id}}: ({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}) => JSX.Element;{{end}}
@@ -29,7 +29,13 @@ export interface RouteHandlers { {{range .Module.UiRoutes}}
 
 // {{.Path}}
 export function {{.Id}}Url({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
-	return ` + "`{{.TsPath}}`" + `;
+	const query: queryParams = {}
+{{range .QueryPlaceholders}}
+	if (opts.{{.}}) {
+		query.{{.}} = opts.{{.}};
+	} {{end}}
+ 
+	return makeQueryParams(` + "`{{.TsPath}}`" + `, query);
 }
 
 // @ts-ignore
