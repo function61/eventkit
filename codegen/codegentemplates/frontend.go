@@ -57,24 +57,27 @@ const FrontendCommandDefinitions = `// tslint:disable
 {{if .Module.Commands.ImportedCustomFieldTypes}}import { {{range .Module.Commands.ImportedCustomFieldTypes}}
 	{{.}},{{end}}
 } from '{{$.Opts.FrontendModulePrefix}}{{.Module.Path}}_types';{{end}}
-import {CommandDefinition, CommandFieldKind, CommandSettings, CrudNature} from 'f61ui/commandtypes';
+// prefixing with c is cumbersome but less than having to conditionally import the exports
+// because some of them are required on rarer cases in generated code
+import * as c from 'f61ui/commandtypes';
 {{if .CommandsImportsUi.Date}}import {dateRFC3339} from 'f61ui/types';
 {{end}}
 {{if .CommandsImportsUi.DateTime}}import {datetimeRFC3339} from 'f61ui/types';
 {{end}}
 
 {{range .Module.Commands}}
-export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}settings: CommandSettings = {}): CommandDefinition {
+export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}{{if .CustomFields}}customFields: { {{range .CustomFields}}{{.Key}}: c.CustomFieldInputFactory<{{.AsTsType}}>,{{end}} }, {{end}}settings: c.CommandSettings = {}): c.CommandDefinition {
 	return {
 		key: '{{.Command}}',{{if .AdditionalConfirmation}}
 		additional_confirmation: '{{EscapeForJsSingleQuote .AdditionalConfirmation}}',
 {{end}}		title: '{{EscapeForJsSingleQuote .Title}}',
-		crudNature: CrudNature.{{.CrudNature}},
+		crudNature: c.CrudNature.{{.CrudNature}},
 		info: {{if .Info}}[{{range .Info}}'{{EscapeForJsSingleQuote .}}',{{end}}]{{else}}[]{{end}},
 		fields: [
 {{.FieldsForTypeScript $}}
 		],
-		settings: settings,
+		settings, {{if .CustomFields}}
+		customFields,{{end}}
 	};
 }
 {{end}}

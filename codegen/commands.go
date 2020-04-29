@@ -183,6 +183,10 @@ func (c *CommandFieldSpec) AsGoType(module *Module) string {
 		return "int"
 	case "date":
 		return "guts.Date"
+	case "custom/string":
+		return "string"
+	case "custom/integer":
+		return "int"
 	default:
 		if isCustomType(c.Type) {
 			if module.HasEnum(c.Type) {
@@ -214,6 +218,10 @@ func (c *CommandFieldSpec) AsTsType() string {
 		return "dateRFC3339"
 	case "datetime":
 		return "datetimeRFC3339"
+	case "custom/string":
+		return "string"
+	case "custom/integer":
+		return "number"
 	default:
 		if isCustomType(c.Type) {
 			if c.Optional {
@@ -280,7 +288,7 @@ func (c *CommandSpec) FieldsForTypeScript(tplData *TplData) string {
 			}
 
 			return fmt.Sprintf(
-				`{ Key: '%s', Title: '%s', Required: %v, HideIfDefaultValue: %v, Kind: CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', Unit: %s, ValidationRegex: '%s' },`,
+				`{ Key: '%s', Title: '%s', Required: %v, HideIfDefaultValue: %v, Kind: c.CommandFieldKind.%s, %s: %s, Help: '%s', Placeholder: '%s', Unit: %s, ValidationRegex: '%s' },`,
 				fieldSpec.Key,
 				escapeStringInsideJsSingleQuotes(fieldSpec.Title),
 				!fieldSpec.Optional,
@@ -307,6 +315,10 @@ func (c *CommandSpec) FieldsForTypeScript(tplData *TplData) string {
 			fieldSerialized = fieldToTypescript(fieldSpec, "Integer", "DefaultValueNumber")
 		case "date":
 			fieldSerialized = fieldToTypescript(fieldSpec, "Date", "DefaultValueString")
+		case "custom/string":
+			fieldSerialized = fieldToTypescript(fieldSpec, "CustomString", "DefaultValueString")
+		case "custom/integer":
+			fieldSerialized = fieldToTypescript(fieldSpec, "CustomNumber", "DefaultValueNumber")
 		default:
 			if isCustomType(fieldSpec.Type) {
 				if tplData.Module.HasEnum(fieldSpec.Type) { // enums as string
@@ -323,6 +335,18 @@ func (c *CommandSpec) FieldsForTypeScript(tplData *TplData) string {
 	}
 
 	return strings.Join(fields, "\n\t\t\t")
+}
+
+func (c *CommandSpec) CustomFields() []CommandFieldSpec {
+	customFields := []CommandFieldSpec{}
+
+	for _, field := range c.Fields {
+		if field.Type == "custom/string" || field.Type == "custom/integer" {
+			customFields = append(customFields, *field)
+		}
+	}
+
+	return customFields
 }
 
 func (c *CommandSpec) CtorArgsForTypeScript() string {
