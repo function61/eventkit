@@ -70,7 +70,7 @@ const DocsCommands = `Overview
 `
 
 const DocsRestEndpoints = `Overview
-========
+--------
 
 | Path | Middleware | Input | Output | Notes |
 |------|------------|-------|--------|-------|
@@ -79,7 +79,7 @@ const DocsRestEndpoints = `Overview
 
 {{range .Module.Types.Endpoints}}
 {{.HttpMethod}} {{.Path}}
-=========================
+-------------------------
 
 | Detail           |                                                       |
 |------------------|-------------------------------------------------------|
