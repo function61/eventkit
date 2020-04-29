@@ -318,7 +318,7 @@ func (c *CommandSpec) FieldsForTypeScript(tplData *TplData) string {
 		case "custom/string":
 			fieldSerialized = fieldToTypescript(fieldSpec, "CustomString", "DefaultValueString")
 		case "custom/integer":
-			fieldSerialized = fieldToTypescript(fieldSpec, "CustomNumber", "DefaultValueNumber")
+			fieldSerialized = fieldToTypescript(fieldSpec, "CustomInteger", "DefaultValueNumber")
 		default:
 			if isCustomType(fieldSpec.Type) {
 				if tplData.Module.HasEnum(fieldSpec.Type) { // enums as string
