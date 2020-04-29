@@ -7,6 +7,7 @@ import (
 
 type DatatypeDef struct {
 	NameRaw  string                  `json:"_"` // "Type" | "module.Type" if referring to another module (such as "domain")
+	Notes    string                  `json:"notes"`
 	Nullable bool                    `json:"nullable"`
 	Of       *DatatypeDef            `json:"of"`     // only used if Name==list
 	Fields   map[string]*DatatypeDef `json:"fields"` // only used if Name==object
