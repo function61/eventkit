@@ -31,9 +31,9 @@ const FrontendRestEndpoints = `// tslint:disable
 // WHY: wouldn't make sense complicating code generation to check
 // if we need template string or not in path string
 
-import { {{range .Module.Types.EndpointsProducesAndConsumesTypescriptTypes}}
+{{if .Module.Types.EndpointsProducesAndConsumesTypescriptTypes}}import { {{range .Module.Types.EndpointsProducesAndConsumesTypescriptTypes}}
 	{{.}},{{end}}
-} from '{{$.Opts.FrontendModulePrefix}}{{.Module.Path}}_types';
+} from '{{$.Opts.FrontendModulePrefix}}{{.Module.Path}}_types';{{end}}
 import {
 	getJson,
 {{if .AnyEndpointHasConsumes}}	postJson,{{end}}
