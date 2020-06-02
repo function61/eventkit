@@ -49,7 +49,7 @@ export function {{.Id}}Match(path: string, query: queryParams): {{if .HasOpts}}{
 {{range .QueryParams}}{{if eq .Type.NameRaw "string"}}
 	const {{.Key}}Par = query.{{.Key}};{{else}}
 	let {{.Key}}Par: number | undefined;
-	if (query{{.Key}} !== undefined) {
+	if (query.{{.Key}} !== undefined) {
 		// parseInt() accepts garbage after the number, and "+" accepts empty string
 		if (query.{{.Key}} === '') {
 			throw new Error("Invalid URL param: '{{.Key}}'; expecting integer, got empty string")
