@@ -4,10 +4,11 @@ package httpcommandclient
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/httpcommand"
 	"github.com/function61/gokit/ezhttp"
-	"net/http"
 )
 
 type Client struct {

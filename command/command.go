@@ -3,8 +3,9 @@ package command
 
 import (
 	"context"
-	"github.com/function61/eventhorizon/pkg/ehevent"
 	"net/http"
+
+	"github.com/function61/eventhorizon/pkg/ehevent"
 )
 
 type Command interface {

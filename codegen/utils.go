@@ -2,11 +2,12 @@ package codegen
 
 import (
 	"fmt"
-	"github.com/function61/gokit/atomicfilewrite"
 	"io"
 	"net/url"
 	"strings"
 	"text/template"
+
+	"github.com/function61/gokit/atomicfilewrite"
 )
 
 func WriteTemplateFile(filename string, data interface{}, templateString string) error {

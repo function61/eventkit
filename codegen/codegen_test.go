@@ -1,9 +1,10 @@
 package codegen
 
 import (
-	"github.com/function61/gokit/assert"
 	"sort"
 	"testing"
+
+	"github.com/function61/gokit/assert"
 )
 
 func TestBeginsWithUppercaseLetter(t *testing.T) {

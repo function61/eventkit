@@ -1,13 +1,14 @@
 package codegen
 
 import (
-	"github.com/function61/eventkit/codegen/codegentemplates"
-	"github.com/function61/gokit/jsonfile"
-	"github.com/function61/gokit/sliceutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/function61/eventkit/codegen/codegentemplates"
+	"github.com/function61/gokit/jsonfile"
+	"github.com/function61/gokit/sliceutil"
 )
 
 type Module struct {

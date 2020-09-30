@@ -3,8 +3,9 @@ package codegen
 import (
 	"errors"
 	"fmt"
-	"github.com/function61/gokit/sliceutil"
 	"strings"
+
+	"github.com/function61/gokit/sliceutil"
 )
 
 type CommandSpecFile []*CommandSpec
