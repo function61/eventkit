@@ -10,7 +10,7 @@ import (
 	"github.com/function61/eventhorizon/pkg/ehevent"
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/eventlog"
-	"github.com/function61/gokit/httpauth"
+	"github.com/function61/gokit/net/http/httpauth"
 )
 
 const (

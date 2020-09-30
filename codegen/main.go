@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	"github.com/function61/eventkit/codegen/codegentemplates"
-	"github.com/function61/gokit/jsonfile"
+	"github.com/function61/gokit/encoding/jsonfile"
 	"github.com/function61/gokit/sliceutil"
 )
 

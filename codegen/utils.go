@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/function61/gokit/atomicfilewrite"
+	"github.com/function61/gokit/os/atomicfilewrite"
 )
 
 func WriteTemplateFile(filename string, data interface{}, templateString string) error {

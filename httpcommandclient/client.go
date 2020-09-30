@@ -8,7 +8,7 @@ import (
 
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/httpcommand"
-	"github.com/function61/gokit/ezhttp"
+	"github.com/function61/gokit/net/http/ezhttp"
 )
 
 type Client struct {
