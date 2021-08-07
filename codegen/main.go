@@ -78,13 +78,13 @@ func processModule(mod *Module, opts Opts) error {
 	hasUiRoutes := mod.UiRoutesFile != ""
 
 	if hasEvents {
-		if err := jsonfile.Read(mod.EventsSpecFile, mod.Events, true); err != nil {
+		if err := jsonfile.ReadDisallowUnknownFields(mod.EventsSpecFile, mod.Events); err != nil {
 			return err
 		}
 	}
 
 	if hasTypes {
-		if err := jsonfile.Read(mod.TypesFile, mod.Types, true); err != nil {
+		if err := jsonfile.ReadDisallowUnknownFields(mod.TypesFile, mod.Types); err != nil {
 			return err
 		}
 		if err := mod.Types.Validate(); err != nil {
@@ -93,7 +93,7 @@ func processModule(mod *Module, opts Opts) error {
 	}
 
 	if hasCommands {
-		if err := jsonfile.Read(mod.CommandsSpecFile, mod.Commands, true); err != nil {
+		if err := jsonfile.ReadDisallowUnknownFields(mod.CommandsSpecFile, mod.Commands); err != nil {
 			return err
 		}
 		if err := mod.Commands.Validate(mod); err != nil {
@@ -102,7 +102,7 @@ func processModule(mod *Module, opts Opts) error {
 	}
 
 	if hasUiRoutes {
-		if err := jsonfile.Read(mod.UiRoutesFile, &mod.UiRoutes, true); err != nil {
+		if err := jsonfile.ReadDisallowUnknownFields(mod.UiRoutesFile, &mod.UiRoutes); err != nil {
 			return err
 		}
 	}
