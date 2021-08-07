@@ -217,7 +217,7 @@ const BackendRestEndpoints = `package {{.Module.Id}}
 
 import (
 	"encoding/json"
-	"github.com/function61/gokit/httpauth"
+	"github.com/function61/gokit/net/http/httpauth"
 	"net/http"
 	"net/url"
 )
