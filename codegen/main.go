@@ -171,7 +171,7 @@ func processModule(mod *Module, opts Opts) error {
 	}
 
 	frontendPath := func(file string) string {
-		return "frontend/generated/" + mod.Path + "_" + file
+		return "frontend/" + opts.FrontendModulePrefix + mod.Path + "_" + file
 	}
 
 	docPath := func(file string) string {
