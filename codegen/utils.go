@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/function61/gokit/os/atomicfilewrite"
+	"github.com/function61/gokit/os/osutil"
 )
 
 func WriteTemplateFile(filename string, data interface{}, templateString string) error {
@@ -23,7 +23,7 @@ func WriteTemplateFile(filename string, data interface{}, templateString string)
 		return fmt.Errorf("WriteTemplateFile Parse %s: %v", filename, err)
 	}
 
-	return atomicfilewrite.Write(filename, func(file io.Writer) error {
+	return osutil.WriteFileAtomic(filename, func(file io.Writer) error {
 		if err := tpl.Execute(file, data); err != nil {
 			return fmt.Errorf("WriteTemplateFile %s: %w", filename, err)
 		}
