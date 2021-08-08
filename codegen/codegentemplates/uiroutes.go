@@ -28,6 +28,10 @@ export interface RouteHandlers { {{range .Module.UiRoutes}}
 	{{.Key}}{{if .Type.Nullable}}?{{end}}: {{if eq .Type.NameRaw "integer"}}number{{else}}string{{end}};{{end}}
 }{{end}}
 
+{{if .Title}}
+export const {{.Id}}Title = '{{.Title}}';
+{{end}}
+
 // {{.Path}}
 export function {{.Id}}URL({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
 	const query: queryParams = {};

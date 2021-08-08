@@ -6,6 +6,7 @@ import (
 
 type uiRouteSpec struct {
 	Id          string `json:"id"`
+	Title       string `json:"title"`
 	Path        string `json:"path"`
 	QueryParams []struct {
 		Key  string      `json:"key"`
