@@ -29,7 +29,7 @@ export interface RouteHandlers { {{range .Module.UiRoutes}}
 }{{end}}
 
 // {{.Path}}
-export function {{.Id}}Url({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
+export function {{.Id}}URL({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
 	const query: queryParams = {};
 {{range .QueryParams}}
 {{if .Type.Nullable}}	if (opts.{{.Key}} !== undefined) {
