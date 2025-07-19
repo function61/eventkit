@@ -1,14 +1,16 @@
 package codegentemplates
 
-const BackendUiRoutes = `package {{.Module.Id}}
+const BackendUiRoutes = `// frontend HTTP URL routes
+package {{.Module.Id}}
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
-func RegisterUiRoutes(routes *mux.Router, uiHandler http.HandlerFunc) { {{range .Module.UiRoutes}}
-	routes.HandleFunc("{{.Path}}", uiHandler){{end}}
+// even though we have a Single-Page-Application -style frontend we should reserve the frontend routes at backend
+// so when user refreshes the page they'll get the SPA bootstrap page for every possible frontend route.
+func RegisterUIRoutes(routes *http.ServeMux, uiHandler http.HandlerFunc) { {{range .Module.UiRoutes}}
+	routes.HandleFunc("GET {{.Path}}", uiHandler){{end}}
 }
 `
 
