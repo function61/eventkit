@@ -17,7 +17,7 @@ func RegisterUIRoutes(routes *http.ServeMux, uiHandler http.HandlerFunc) { {{ran
 const FrontendUiRoutes = `// tslint:disable
 // WARNING: generated file
 
-import { parseQueryParams, queryParams, makeQueryParams } from 'f61ui/httputil';
+import { parseQueryParams, QueryParams, makeQueryParams } from 'f61ui/httputil';
 
 export interface RouteHandlers { {{range .Module.UiRoutes}}
 	{{.Id}}: ({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}) => JSX.Element;{{end}}
@@ -36,7 +36,7 @@ export const {{.Id}}Title = '{{.Title}}';
 
 // {{.Path}}
 export function {{.Id}}URL({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
-	const query: queryParams = {};
+	const query: QueryParams = {};
 {{range .QueryParams}}
 {{if .Type.Nullable}}	if (opts.{{.Key}} !== undefined) {
 	{{end}}	query.{{.Key}} = opts.{{.Key}}{{if eq .Type.NameRaw "integer"}}.toString(){{end}};{{if .Type.Nullable}}
@@ -46,7 +46,7 @@ export function {{.Id}}URL({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string 
 	return makeQueryParams(` + "`{{.TsPath}}`" + `, query);
 }
 
-export function {{.Id}}Match(path: string, query: queryParams): {{if .HasOpts}}{{.TsOptsName}}{{else}}{}{{end}} | null {
+export function {{.Id}}Match(path: string, query: QueryParams): {{if .HasOpts}}{{.TsOptsName}}{{else}}{}{{end}} | null {
 	const matches = {{.PathReJavaScript}}.exec(path);
 	if (matches == null) {
 		return null;
