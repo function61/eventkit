@@ -10,7 +10,7 @@ import (
 // even though we have a Single-Page-Application -style frontend we should reserve the frontend routes at backend
 // so when user refreshes the page they'll get the SPA bootstrap page for every possible frontend route.
 func RegisterUIRoutes(routes *http.ServeMux, uiHandler http.HandlerFunc) { {{range .Module.UiRoutes}}
-	routes.HandleFunc("GET {{.Path}}", uiHandler){{end}}
+	routes.HandleFunc("GET {{if eq .Path "/"}}/{$}{{else}}{{.Path}}{{end}}", uiHandler){{end}}
 }
 `
 
