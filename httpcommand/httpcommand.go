@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/function61/eventhorizon/pkg/ehevent"
 	"github.com/function61/eventkit/command"
 	"github.com/function61/eventkit/eventlog"
 	"github.com/function61/gokit/net/http/httpauth"
@@ -85,7 +84,7 @@ func Serve(
 
 	ctx := command.NewCtx(
 		r.Context(),
-		ehevent.Meta(time.Now(), userId),
+		eventlog.Meta(time.Now(), userId),
 		r.RemoteAddr,
 		r.Header.Get("User-Agent"))
 

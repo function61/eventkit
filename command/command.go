@@ -5,7 +5,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/function61/eventhorizon/pkg/ehevent"
+	"github.com/function61/eventkit/eventlog"
 )
 
 type Command interface {
@@ -27,12 +27,12 @@ type Allocators map[string]func() Command
 type Ctx struct {
 	Ctx context.Context // Go's cancellation context
 
-	Meta ehevent.EventMeta
+	Meta eventlog.EventMeta
 
 	RemoteAddr string
 	UserAgent  string
 
-	raisedEvents []ehevent.Event
+	raisedEvents []eventlog.Event
 
 	cookies []*http.Cookie
 
@@ -42,7 +42,7 @@ type Ctx struct {
 
 func NewCtx(
 	ctx context.Context,
-	meta ehevent.EventMeta,
+	meta eventlog.EventMeta,
 	remoteAddr string,
 	userAgent string,
 ) *Ctx {
@@ -51,16 +51,16 @@ func NewCtx(
 		Meta:         meta,
 		RemoteAddr:   remoteAddr,
 		UserAgent:    userAgent,
-		raisedEvents: []ehevent.Event{},
+		raisedEvents: []eventlog.Event{},
 		cookies:      []*http.Cookie{},
 	}
 }
 
-func (c *Ctx) GetRaisedEvents() []ehevent.Event {
+func (c *Ctx) GetRaisedEvents() []eventlog.Event {
 	return c.raisedEvents
 }
 
-func (c *Ctx) RaisesEvent(event ehevent.Event) {
+func (c *Ctx) RaisesEvent(event eventlog.Event) {
 	c.raisedEvents = append(c.raisedEvents, event)
 }
 
