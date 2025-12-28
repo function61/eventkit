@@ -1,6 +1,6 @@
 package codegentemplates
 
-const BackendUiRoutes = `// frontend HTTP URL routes
+const BackendUIRoutes = `// frontend HTTP URL routes
 package {{.Module.Id}}
 
 import (
@@ -14,7 +14,7 @@ func RegisterUIRoutes(routes *http.ServeMux, uiHandler http.HandlerFunc) { {{ran
 }
 `
 
-const FrontendUiRoutes = `// tslint:disable
+const FrontendUIRoutes = `// tslint:disable
 // WARNING: generated file
 
 import { parseQueryParams, QueryParams, makeQueryParams } from 'f61ui/httputil';
@@ -34,7 +34,7 @@ export interface RouteHandlers { {{range .Module.UiRoutes}}
 export const {{.Id}}Title = '{{.Title}}';
 {{end}}
 
-// {{.Path}}
+/** {{.Path}} */
 export function {{.Id}}URL({{if .HasOpts}}opts: {{.TsOptsName}}{{end}}): string {
 	const query: QueryParams = {};
 {{range .QueryParams}}

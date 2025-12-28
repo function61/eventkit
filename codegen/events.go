@@ -6,22 +6,30 @@ import (
 )
 
 type GoStructField struct {
-	Name string
-	Type string
-	Tags string
+	Name    string
+	Type    string
+	Tags    string
+	Comment string
 }
 
 func (g *GoStructField) AsGoCode() string {
+	commentAsCode := ""
+	if g.Comment != "" {
+		commentAsCode = " // " + g.Comment
+	}
+
 	return fmt.Sprintf(
-		"%s %s `%s`",
+		"%s %s `%s`%s",
 		g.Name,
 		g.Type,
-		g.Tags)
+		g.Tags,
+		commentAsCode)
 }
 
 type GoStruct struct {
-	Name   string
-	Fields []GoStructField
+	Name    string
+	Fields  []GoStructField
+	Comment string
 }
 
 func (g *GoStruct) Field(name string) *GoStructField {
@@ -64,7 +72,12 @@ func (v *Visitor) AsGoCode() string {
 	structs := []string{}
 
 	for _, item := range v.Structs {
-		structs = append(structs, "type "+item.Name+" "+item.AsGoCode())
+		commentAsCode := ""
+		if item.Comment != "" {
+			commentAsCode = "// " + item.Comment + "\n"
+		}
+
+		structs = append(structs, commentAsCode+"type "+item.Name+" "+item.AsGoCode())
 	}
 
 	return strings.Join(structs, "\n\n")

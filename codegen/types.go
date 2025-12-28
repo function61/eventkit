@@ -7,7 +7,7 @@ type ProcessedStringEnumMember struct {
 }
 
 type ProcessedStringEnum struct {
-	Name          string
+	Definition    EnumDef
 	MembersDigest string
 	Members       []ProcessedStringEnumMember
 }
@@ -16,11 +16,13 @@ type EnumDef struct {
 	Name          string   `json:"name"`
 	Type          string   `json:"type"`
 	StringMembers []string `json:"stringMembers"`
+	Description   string   `json:"description"`
 }
 
 type StringConstDef struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Key         string `json:"key"`
+	Value       string `json:"value"`
+	Description string `json:"description,omitempty"`
 }
 
 type DomainFile struct {

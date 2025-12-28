@@ -12,12 +12,8 @@ var enumValueCamelCaser = regexp.MustCompile("[^a-zA-Z0-9]+")
 
 // "abba_cd" => "AbbaCd"
 func camelCaseEnumValue(in string) string {
-	return strings.Replace(
-		strings.Title(
-			enumValueCamelCaser.ReplaceAllString(in, " ")),
-		" ",
-		"",
-		-1)
+	return strings.ReplaceAll(strings.Title(
+		enumValueCamelCaser.ReplaceAllString(in, " ")), " ", "")
 }
 
 func ProcessStringEnums(enums []EnumDef) []ProcessedStringEnum {
@@ -41,7 +37,7 @@ func ProcessStringEnums(enums []EnumDef) []ProcessedStringEnum {
 		}
 
 		processed = append(processed, ProcessedStringEnum{
-			Name:          enum.Name,
+			Definition:    enum,
 			MembersDigest: hex.EncodeToString(membersDigest[:])[0:6],
 			Members:       members,
 		})

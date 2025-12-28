@@ -13,13 +13,15 @@ import * as {{.}} from '{{$.Opts.FrontendModulePrefix}}{{.}}_types';{{end}}
 {{end}}
 
 {{range .StringEnums}}
-export enum {{.Name}} {
+{{if .Definition.Description}}/** {{.Definition.Description}} */
+{{end}}export enum {{.Definition.Name}} {
 {{range .Members}}
 	{{.Key}} = '{{.GoValue}}',{{end}}
 }
 {{end}}
 {{range .Module.Types.StringConsts}}
-export const {{.Key}} = '{{EscapeForJsSingleQuote .Value}}';{{end}}
+{{if .Description}}/** {{.Description}} */
+{{end}}export const {{.Key}} = '{{EscapeForJsSingleQuote .Value}}';{{end}}
 {{range .Module.Types.Types}}
 {{.AsTypeScriptCode}}
 {{end}}
@@ -40,11 +42,12 @@ import {
 } from 'f61ui/httputil';
 
 {{range .Module.Types.Endpoints}}
-// {{.Path}}
+/** {{.Path}} */
 export function {{.Name}}({{.TypescriptArgs}}) {
 	return {{if .Consumes}}postJson<{{if .Consumes}}{{.Consumes.AsTypeScriptType}}{{else}}void{{end}}, {{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{else}}getJson<{{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{end}}(` + "`{{.TypescriptPath}}`" + `{{if .Consumes}}, body{{end}});
 }
 {{if not .Consumes}}
+/** {{.Path}} */
 export function {{.Name}}URL({{.TypescriptArgs}}): string {
 	return ` + "`{{.TypescriptPath}}`" + `;
 }{{end}}
@@ -66,6 +69,7 @@ import * as c from 'f61ui/commandtypes';
 {{end}}
 
 {{range .Module.Commands}}
+/** {{.Title}} */
 export function {{.AsGoStructName}}({{if .CtorArgsForTypeScript}}{{.CtorArgsForTypeScript}}, {{end}}{{if .CustomFields}}customFields: { {{range .CustomFields}}{{.Key}}: c.CustomFieldInputFactory<{{.AsTsType}}>,{{end}} }, {{end}}settings: c.CommandSettings = {}): c.CommandDefinition {
 	return {
 		key: '{{.Command}}',{{if .AdditionalConfirmation}}

@@ -161,27 +161,28 @@ import ( {{if .StringEnums}}
 {{end}}
 
 {{range $_, $enum := .StringEnums}}
-type {{$enum.Name}} string
+{{if $enum.Definition.Description}}// {{$enum.Definition.Description}}
+{{end}}type {{$enum.Definition.Name}} string
 const (
 {{range $_, $member := $enum.Members}}
-	{{$member.GoKey}} {{$enum.Name}} = "{{$member.GoValue}}"{{end}}
+	{{$member.GoKey}} {{$enum.Definition.Name}} = "{{$member.GoValue}}"{{end}}
 )
 
-var {{$enum.Name}}Members = []{{$enum.Name}}{ {{range $_, $member := $enum.Members}}
+var {{$enum.Definition.Name}}Members = []{{$enum.Definition.Name}}{ {{range $_, $member := $enum.Members}}
 	{{$member.GoKey}},{{end}}
 }
 
-func (e *{{$enum.Name}}) MarshalJSON() ([]byte, error) {
+func (e *{{$enum.Definition.Name}}) MarshalJSON() ([]byte, error) {
 	str := string(*e)
 	return json.Marshal(&str)
 }
 
-func (e *{{$enum.Name}}) UnmarshalJSON(b []byte) error {
+func (e *{{$enum.Definition.Name}}) UnmarshalJSON(b []byte) error {
 	var str string
 	if err := json.Unmarshal(b, &str); err != nil {
 		return err
 	}
-	validated, err := {{$enum.Name}}Validate(str)
+	validated, err := {{$enum.Definition.Name}}Validate(str)
 	if err != nil {
 		return err
 	}
@@ -189,27 +190,28 @@ func (e *{{$enum.Name}}) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func {{$enum.Name}}Validate(input string) ({{$enum.Name}}, error) {
-	for _, member := range {{$enum.Name}}Members {
-		if member == {{$enum.Name}}(input) {
+func {{$enum.Definition.Name}}Validate(input string) ({{$enum.Definition.Name}}, error) {
+	for _, member := range {{$enum.Definition.Name}}Members {
+		if member == {{$enum.Definition.Name}}(input) {
 			return member, nil
 		}
 	}
 
-	return "", fmt.Errorf("invalid {{$enum.Name}} member: %s", input)
+	return "", fmt.Errorf("invalid {{$enum.Definition.Name}} member: %s", input)
 }
 
 // digest in name because there's no easy way to make exhaustive Enum pattern matching
 // in Go, so we hack around it by calling this generated function everywhere we want
 // to do the pattern match, and when enum members change the digest changes and thus
 // it forces you to manually review and fix each place
-func {{$enum.Name}}Exhaustive{{$enum.MembersDigest}}(in {{$enum.Name}}) {{$enum.Name}} {
+func {{$enum.Definition.Name}}Exhaustive{{$enum.MembersDigest}}(in {{$enum.Definition.Name}}) {{$enum.Definition.Name}} {
 	return in
 }
 {{end}}
 
 {{range .Module.Types.StringConsts}}
-const {{.Key}} = "{{.Value}}";
+{{if .Description}}// {{.Description}}
+{{end}}const {{.Key}} = "{{.Value}}";
 {{end}}
 `
 

@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -213,8 +212,8 @@ func processModule(mod *Module, opts Opts) error {
 		renderOneIf(hasTypes, backendPath("types.gen.go"), codegentemplates.BackendTypes),
 		renderOneIf(hasTypes, frontendPath("types.ts"), codegentemplates.FrontendDatatypes),
 		renderOneIf(hasTypes && docs, docPath("types.md"), codegentemplates.DocsTypes),
-		renderOneIf(hasUiRoutes, backendPath("ui-routes.gen.go"), codegentemplates.BackendUiRoutes),
-		renderOneIf(hasUiRoutes, frontendPath("uiroutes.ts"), codegentemplates.FrontendUiRoutes),
+		renderOneIf(hasUiRoutes, backendPath("ui-routes.gen.go"), codegentemplates.BackendUIRoutes),
+		renderOneIf(hasUiRoutes, frontendPath("uiroutes.ts"), codegentemplates.FrontendUIRoutes),
 	)
 }
 
@@ -240,7 +239,7 @@ func CompanionFile(targetPath string) FileToGenerate {
 	return FileToGenerate{
 		targetPath: targetPath,
 		obtainTemplate: func() (string, error) {
-			templateContent, readErr := ioutil.ReadFile(targetPath + ".template")
+			templateContent, readErr := os.ReadFile(targetPath + ".template")
 			if readErr != nil {
 				return "", readErr
 			}

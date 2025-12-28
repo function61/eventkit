@@ -102,11 +102,14 @@ func (e *EndpointDefinition) GoArgs() string {
 }
 
 type NamedDatatypeDef struct {
-	Name string       `json:"name"`
-	Type *DatatypeDef `json:"type"`
+	Name        string       `json:"name"`
+	Type        *DatatypeDef `json:"type"`
+	Description string       `json:"description,omitempty"`
 }
 
 func (s *NamedDatatypeDef) AsTypeScriptCode() string {
+	const newlineAndIndent = "\n\t"
+
 	if s.Type.NameRaw != "object" {
 		return "export type " + s.Name + " = " + s.Type.AsTypeScriptType()
 	}
@@ -114,10 +117,20 @@ func (s *NamedDatatypeDef) AsTypeScriptCode() string {
 	fieldsSerialized := []string{}
 
 	for _, field := range s.Type.FieldsSorted() {
-		fieldsSerialized = append(fieldsSerialized, field.Key+": "+field.Type.AsTypeScriptType()+";")
+		fieldComment := ""
+		if description := field.Type.Description; description != "" {
+			fieldComment = "/** " + description + " */" + newlineAndIndent
+		}
+
+		fieldsSerialized = append(fieldsSerialized, fieldComment+field.Key+": "+field.Type.AsTypeScriptType()+";")
 	}
 
-	return "export interface " + s.Name + " " + "{\n\t" + strings.Join(fieldsSerialized, "\n\t") + "\n}"
+	codeComment := ""
+	if s.Description != "" {
+		codeComment = "/** " + s.Description + " */\n"
+	}
+
+	return codeComment + "export interface " + s.Name + " " + "{\n\t" + strings.Join(fieldsSerialized, newlineAndIndent) + "\n}"
 }
 
 func (s *NamedDatatypeDef) AsToGoCode() string {
@@ -131,18 +144,25 @@ func (s *NamedDatatypeDef) AsToGoCode() string {
 
 	for _, field := range s.Type.FieldsSorted() {
 		fields = append(fields, GoStructField{
-			Name: field.Key,
-			Type: AsGoTypeWithInlineSupport(field.Type, field.Key, visitor),
-			Tags: "json:\"" + field.Key + "\"",
+			Name:    field.Key,
+			Type:    AsGoTypeWithInlineSupport(field.Type, field.Key, visitor),
+			Tags:    "json:\"" + field.Key + "\"",
+			Comment: field.Type.Description,
 		})
 	}
 
 	structProcessed := GoStruct{
 		Name:   s.Name,
 		Fields: fields,
+		// Comment: s.Description,
 	}
 
-	return "type " + s.Name + " " + structProcessed.AsGoCode()
+	commentAsCode := ""
+	if description := s.Description; description != "" {
+		commentAsCode = "// " + description + "\n"
+	}
+
+	return commentAsCode + "type " + s.Name + " " + structProcessed.AsGoCode()
 }
 
 func (d *DatatypeDef) AsTypeScriptType() string {
