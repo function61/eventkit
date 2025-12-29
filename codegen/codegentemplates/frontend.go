@@ -45,7 +45,7 @@ export function {{.Name}}({{.TypescriptArgs}}) {
 	return {{if .Consumes}}postJson<{{if .Consumes}}{{.Consumes.AsTypeScriptType}}{{else}}void{{end}}, {{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{else}}getJson<{{if .Produces}}{{.Produces.AsTypeScriptType}}{{else}}void{{end}}>{{end}}(` + "`{{.TypescriptPath}}`" + `{{if .Consumes}}, body{{end}});
 }
 {{if not .Consumes}}
-export function {{.Name}}Url({{.TypescriptArgs}}): string {
+export function {{.Name}}URL({{.TypescriptArgs}}): string {
 	return ` + "`{{.TypescriptPath}}`" + `;
 }{{end}}
 {{end}}
