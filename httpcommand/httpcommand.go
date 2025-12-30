@@ -4,6 +4,7 @@ package httpcommand
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -113,6 +114,7 @@ func InvokeSkippingAuthorization(
 	invoker command.Invoker,
 	eventLog eventlog.Log,
 ) *HttpError {
+	cmdStruct.Key()
 	if errValidate := cmdStruct.Validate(); errValidate != nil {
 		return badRequest("command_validation_failed", errValidate.Error())
 	}
@@ -122,7 +124,7 @@ func InvokeSkippingAuthorization(
 		if httpErr, is := errInvoke.(*HttpError); is {
 			return httpErr // use as-is
 		} else {
-			return badRequest("command_failed", errInvoke.Error())
+			return badRequest("command_failed", fmt.Sprintf("%s: %s", cmdStruct.Key(), errInvoke.Error()))
 		}
 	}
 
